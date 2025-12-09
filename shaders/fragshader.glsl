@@ -6,9 +6,6 @@ out vec4 finalColor;
 
 uniform sampler2D uTexture;
 
-float near = 0.1; 
-float far  = 100.0; 
-  
 
 
 

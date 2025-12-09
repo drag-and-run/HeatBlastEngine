@@ -1,14 +1,15 @@
-﻿using Silk.NET.Windowing;
-using Silk.NET.Maths;
+﻿using HeatBlastEngine.code.assets.models;
+using HeatBlastEngine.code.Core;
+using HeatBlastEngine.code.Core.Entities.Lights;
+using ImGuiNET;
 using Silk.NET.Input;
+using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
-using ImGuiNET;
+using Silk.NET.Windowing;
 using System.Drawing;
 using System.Numerics;
-using HeatBlastEngine.code.Core;
-using HeatBlastEngine.code.assets.models;
-using HeatBlastEngine.code.Core.Entities.Lights;
+using System.Runtime.InteropServices;
 
 
 public class Program
@@ -53,6 +54,10 @@ public class Program
 
         
     }
+
+
+
+
     private static void OnFramebufferResize(Vector2D<int> newsize)
     {
         _gl.Viewport(newsize);
@@ -87,6 +92,12 @@ public class Program
         _gl.Enable(GLEnum.CullFace);
         _gl.Enable(EnableCap.Multisample);
         _gl.Enable(GLEnum.DepthTest);
+        _gl.Enable(GLEnum.DebugOutput);
+        _gl.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
+        {
+            string msg = Marshal.PtrToStringAnsi(message, length);
+            Console.WriteLine($"OpenGL Debug: {msg}, Severity: {severity}");
+        }, IntPtr.Zero);
         #endregion
 
 
@@ -96,11 +107,32 @@ public class Program
 
         _controller = new ImGuiController(_gl, _window, input);
 
-        var mat = new BaseMaterial(new BaseTexture(_gl, "textures/test.png"), new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"));
-        var mdl = new Model(_gl, "models/test.obj");
+        var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
+            new BaseTexture(_gl, "textures/test.png", TextureType.Color));
+        var skymdl = new Model(_gl, "models/editor/cube.obj");
+        var mdl2 = new Model(_gl, "models/test.obj");
 
- 
-        _entities.Add(new BaseEntity(mat, mdl,new Transform() ));
+      
+
+        string[] cubemap = new string[]
+        {
+            "textures/skybox/px.png", 
+            "textures/skybox/nx.png",
+            "textures/skybox/py.png", //Top
+            "textures/skybox/ny.png", //Bottom
+            "textures/skybox/pz.png",
+            "textures/skybox/nz.png",
+
+        };
+
+        var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
+           new BaseTexture(_gl, cubemap));
+
+
+        _entities.Add(new SkyEntity(skybox, skymdl,  new Transform(Vector3.Zero)));
+
+        _entities.Add(new BaseEntity(mat, mdl2, new Transform(Vector3.Zero)));
+
 
         _Light = new LightObject(new Transform(new Vector3(0,0,0)));
 

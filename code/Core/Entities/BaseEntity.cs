@@ -27,17 +27,26 @@ public class BaseEntity : IDisposable
         Name = _name;
         Transform = _transform;
 
-        Material.Use();
+        try
+        {
+            Material.Use();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BaseEntity] Exception during Material.Use() for entity {uid}: {ex.Message}\n{ex.StackTrace}");
+            throw;
+        }
 
  
     }
+
 
     public virtual unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, GL _gl, LightObject _light)
     {
         var size = _window.FramebufferSize;
         var model = Matrix4x4.CreateFromQuaternion(Transform.Rotation) * Matrix4x4.CreateTranslation(Transform.Position);
         var view = Matrix4x4.CreateLookAt(camera.Transform.Position, camera.Transform.Position + camera.Front, camera.Transform.Up);
-        var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 100f);
+        var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
         Material.Shader.Use();
         Material.Shader.SetUniform("ulightPos", _light.Transform.Position);
         Material.Shader.SetUniform("uViewPos", camera.Transform.Position);

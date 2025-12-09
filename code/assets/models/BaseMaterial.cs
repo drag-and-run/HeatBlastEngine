@@ -12,18 +12,58 @@ namespace HeatBlastEngine.code.assets.models
     {
         public BaseTexture Texture;
         public BaseShader Shader;
-        public BaseMaterial(BaseTexture _texture, BaseShader _shader)
+        public BaseMaterial(BaseShader _shader, BaseTexture _texture)
         {
             Texture = _texture;
             Shader = _shader;
+          
         }
 
         public void Use()
         {
-            Shader.Use();
-            Texture.Bind(TextureUnit.Texture0);
+            try
+            {
+                Console.WriteLine("[BaseMaterial] Using shader and binding texture...");
+                Shader.Use();
+                Console.WriteLine("[BaseMaterial] Shader.Use() OK");
 
-            Shader.SetUniform("uTexture", 0);
+                if (Texture == null)
+                {
+                    Console.WriteLine("[BaseMaterial] Warning: Texture is null");
+                }
+
+                Texture.Bind(TextureUnit.Texture0);
+                Console.WriteLine($"[BaseMaterial] Texture bound (id): {Texture?.GetHashCode()}");
+
+                if (Texture.Type == TextureType.Cubemap)
+                {
+                    try
+                    {
+                        Shader.SetUniform("uCubemap", 0);
+                        Console.WriteLine("CUBEMAP TEXTURE BOUND");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[BaseMaterial] Error setting cubemap uniform: {ex.Message}\n{ex.StackTrace}");
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        Shader.SetUniform("uTexture", 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[BaseMaterial] Error setting texture uniform: {ex.Message}\n{ex.StackTrace}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BaseMaterial] Exception in Use(): {ex.Message}\n{ex.StackTrace}");
+                throw;
+            }
         }
     }
 }

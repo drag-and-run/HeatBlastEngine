@@ -59,7 +59,8 @@ namespace HeatBlastEngine.code.Core
             int location = _gl.GetUniformLocation(_handle, name);
             if (location == -1)
             {
-                throw new Exception($"{name} uniform not found on shader.");
+                Console.WriteLine($"Warning: matrix uniform '{name}' not found on shader (skipping).");
+                return;
             }
             _gl.UniformMatrix4(location, 1, false, (float*)&value);
         }
@@ -69,7 +70,8 @@ namespace HeatBlastEngine.code.Core
             int location = _gl.GetUniformLocation(_handle, name);
             if (location == -1)
             {
-                throw new Exception($"{name} uniform not found on shader.");
+                Console.WriteLine($"Warning: float uniform '{name}' not found on shader (skipping).");
+                return;
             }
             _gl.Uniform1(location, value);
         }
@@ -79,7 +81,8 @@ namespace HeatBlastEngine.code.Core
             int location = _gl.GetUniformLocation(_handle, name);
             if (location == -1)
             {
-                throw new Exception($"{name} uniform not found on shader.");
+                Console.WriteLine($"Warning: vec3 uniform '{name}' not found on shader (skipping).");
+                return;
             }
             _gl.Uniform3(location, value);
 
@@ -90,7 +93,8 @@ namespace HeatBlastEngine.code.Core
             int location = _gl.GetUniformLocation(_handle, name);
             if (location == -1)
             {
-                throw new Exception($"{name} uniform not found on shader.");
+                Console.WriteLine($"Warning: matrix4 uniform '{name}' not found on shader (skipping).");
+                return;
             }
             _gl.UniformMatrix4(location, 1, false, (float*)&value);
         }
