@@ -4,19 +4,51 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace HeatBlastEngine.code.assets.models
+namespace HeatBlastEngine.code.assets
 {
     public class BaseMaterial
     {
-        public BaseTexture Texture;
-        public BaseShader Shader;
-        public BaseMaterial(BaseShader _shader, BaseTexture _texture)
+        public string Name { get; set; }
+        public BaseShader Shader { get; set; }
+        public BaseTexture Texture { get; set; }
+
+
+
+        public BaseMaterial(BaseShader _shader, BaseTexture _texture, string _name = "default_material")
         {
             Texture = _texture;
             Shader = _shader;
-          
+            Name = _name;
+        }
+        [JsonConstructor]
+        public BaseMaterial()
+        {
+
+        }
+
+        public static BaseMaterial LoadFromFile(string filepath, GL _gl)
+        {
+            string jsonString = File.ReadAllText(filepath);
+            if (jsonString is null)
+            {
+                Console.WriteLine($"faile to load material{filepath}");
+                return null;
+            }
+            BaseMaterial material = JsonSerializer.Deserialize<BaseMaterial>(jsonString)!;
+            if (material.Texture.Type == TextureType.Cubemap)
+            {
+                return new BaseMaterial(new BaseShader(_gl, material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
+                    new BaseTexture(_gl, material.Texture.Path, material.Texture.Type), material.Name);
+            }
+            else
+            {
+                return new BaseMaterial(new BaseShader(_gl, material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
+                    new BaseTexture(_gl, material.Texture.Path[0], material.Texture.Type), material.Name);
+            }
         }
 
         public void Use()

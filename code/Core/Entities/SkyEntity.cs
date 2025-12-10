@@ -1,4 +1,4 @@
-using HeatBlastEngine.code.assets.models;
+using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Core.Entities.Lights;
 using Silk.NET.Maths;

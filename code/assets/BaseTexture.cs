@@ -1,6 +1,8 @@
 ﻿
 using Silk.NET.OpenGL;
 using StbImageSharp;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public enum TextureType
 {
@@ -16,26 +18,30 @@ public class BaseTexture : IDisposable
     private uint _texture;
     private GL _gl = null!;
 
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public TextureType Type { get; set; }
 
-    public string Path { get;  set; }
+    public string[] Path { get;  set; }
+
+    public BaseTexture() { }
 
     public unsafe BaseTexture(GL gl, string filepath, TextureType _type) 
     { 
         _gl = gl;
         _texture = _gl.GenTexture();
-        Path = filepath;
+        Path = new[] {filepath};
+        Path[0] = filepath;
         Type = _type;
-
+    
         Bind();
-
+    
         ImageResult result = ImageResult.FromMemory(System.IO.File.ReadAllBytes(filepath), ColorComponents.RedGreenBlueAlpha);
         fixed (byte* ptr = result.Data)
         {
             _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgb, (uint)result.Width,
                 (uint)result.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
         }
-
+    
         SetParameters();
     }
     public unsafe BaseTexture(GL gl, string[] filepath, TextureType _type = TextureType.Cubemap) 
@@ -45,7 +51,7 @@ public class BaseTexture : IDisposable
         // remember this is a cubemap texture
         Type = _type;
         // store a simple path string (first face) for diagnostics
-        Path = filepath != null && filepath.Length > 0 ? filepath[0] : string.Empty;
+        
 
         Console.WriteLine($"[BaseTexture] Generated texture id {_texture} for cubemap. Binding...");
         // Ensure the correct target is bound for cubemap uploads
@@ -53,6 +59,8 @@ public class BaseTexture : IDisposable
 
         for (int i = 0; i < 6; i++)
         {
+            Path = new string[i];
+            Path = filepath;
             string path = filepath[i];
             Console.WriteLine($"[BaseTexture] Loading cubemap face {i}: {path}");
             ImageResult img = ImageResult.FromMemory(System.IO.File.ReadAllBytes(path), ColorComponents.RedGreenBlue);

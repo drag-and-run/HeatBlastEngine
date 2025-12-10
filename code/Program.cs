@@ -1,7 +1,8 @@
-﻿using HeatBlastEngine.code.assets.models;
+﻿using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Core.Entities.Lights;
 using ImGuiNET;
+using Sandbox;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -10,11 +11,14 @@ using Silk.NET.Windowing;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 
 public class Program
 {
     public static string MAIN_TITLE = "HeastBlastEngine";
+    public static int ENGINE_FPS = 140;
 
     private static IWindow _window;
     private static GL _gl;
@@ -32,13 +36,15 @@ public class Program
 
     private static LightObject _Light;
 
+    
+
     public static void Main(string[] args)
     {
         WindowOptions options = WindowOptions.Default with
         {
-            Size = new Vector2D<int>(800, 600),
+            Size = new Vector2D<int>(1920, 1080),
             Title = MAIN_TITLE,
-            FramesPerSecond = 140,
+            FramesPerSecond = ENGINE_FPS,
             VSync = false,
             Samples = 8
         };
@@ -107,31 +113,44 @@ public class Program
 
         _controller = new ImGuiController(_gl, _window, input);
 
-        var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
-            new BaseTexture(_gl, "textures/test.png", TextureType.Color));
+
+        //var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
+        //    new BaseTexture(_gl, "textures/test.png", TextureType.Color), "test_material");
+        //
+        //string json = JsonSerializer.Serialize(mat, new JsonSerializerOptions { WriteIndented = true });
+        //File.WriteAllText("textures/test.matfile", json);
+        //
+        //string[] cubemap = new string[]
+        //{
+        //    "textures/skybox/px.png", 
+        //    "textures/skybox/nx.png",
+        //    "textures/skybox/py.png", //Top
+        //    "textures/skybox/ny.png", //Bottom
+        //    "textures/skybox/pz.png",
+        //    "textures/skybox/nz.png",
+        //
+        //};
+        //
+        //var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
+        //   new BaseTexture(_gl, cubemap), "sky_material");
+        //
+        //string jsonsky = JsonSerializer.Serialize(skybox, new JsonSerializerOptions { WriteIndented = true });
+        //File.WriteAllText("textures/skybox.matfile", jsonsky);
+
+
+
+        var skymat = BaseMaterial.LoadFromFile("textures/skybox.matfile", _gl);
         var skymdl = new Model(_gl, "models/editor/cube.obj");
-        var mdl2 = new Model(_gl, "models/test.obj");
+        _entities.Add(new SkyEntity(skymat, skymdl,  new Transform(Vector3.Zero)));
 
-      
+       //var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
+       //var plane_mdl = new Model(_gl, "models/editor/plane.obj");
+       //_entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
 
-        string[] cubemap = new string[]
-        {
-            "textures/skybox/px.png", 
-            "textures/skybox/nx.png",
-            "textures/skybox/py.png", //Top
-            "textures/skybox/ny.png", //Bottom
-            "textures/skybox/pz.png",
-            "textures/skybox/nz.png",
+       var mat = BaseMaterial.LoadFromFile("textures/test.matfile", _gl);
+       var cubebox_mdl = new Model(_gl, "models/test.obj");
+       _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(Vector3.Zero)));
 
-        };
-
-        var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
-           new BaseTexture(_gl, cubemap));
-
-
-        _entities.Add(new SkyEntity(skybox, skymdl,  new Transform(Vector3.Zero)));
-
-        _entities.Add(new BaseEntity(mat, mdl2, new Transform(Vector3.Zero)));
 
 
         _Light = new LightObject(new Transform(new Vector3(0,0,0)));
@@ -189,9 +208,9 @@ public class Program
         _Light.Transform.Position = camera.Transform.Position;
     }
 
+    static TimeSince updatestats = 0;
     private static unsafe void OnRender(double deltaTime) 
     {
-
         BaseTime.Elapsed = (float)_window.Time;
         BaseTime.FPS = 1 / deltaTime;
 
@@ -204,18 +223,24 @@ public class Program
         {
             if (ent is null) return;
             ent.Render(camera, _window, _gl, _Light);
-            ImGui.Text(ent.Name);
-
-            float normalLength = 0.2f; // scale factor for visibility
-
-
+            ImGui.Text($"{ent.ToString()} Name: {ent.Name}");
         }
 
+        ImGui.SliderInt("t", ref ENGINE_FPS, 5, 1000);
+        _window.FramesPerSecond = ENGINE_FPS;
 
+
+        if (updatestats >= 0.25f)
+        {
+            _window.Title = $"{MAIN_TITLE} {Math.Ceiling(BaseTime.FPS)} FPS";
+            updatestats = 0;
+        }
+
+        
      
         ImGui.StyleColorsLight();
         ImGui.End();
-
+        
         _controller.Render();
     }
     static bool isCursorVisible = false;

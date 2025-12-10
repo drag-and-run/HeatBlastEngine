@@ -1,4 +1,4 @@
-using HeatBlastEngine.code.assets.models;
+using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Core.Entities.Lights;
 using Silk.NET.Maths;
@@ -23,6 +23,7 @@ public class BaseEntity : IDisposable
 
         Console.WriteLine(uid);
         Material = _material;
+        Console.WriteLine(Material);
         Model = _model;
         Name = _name;
         Transform = _transform;
