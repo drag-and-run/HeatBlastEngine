@@ -25,70 +25,44 @@ public class BaseTexture : IDisposable
 
     public BaseTexture() { }
 
-    public unsafe BaseTexture(GL gl, string filepath, TextureType _type) 
+    public unsafe BaseTexture(GL gl, string[] filepath, TextureType _type) 
     { 
         _gl = gl;
         _texture = _gl.GenTexture();
-        Path = new[] {filepath};
-        Path[0] = filepath;
         Type = _type;
-    
-        Bind();
-    
-        ImageResult result = ImageResult.FromMemory(System.IO.File.ReadAllBytes(filepath), ColorComponents.RedGreenBlueAlpha);
-        fixed (byte* ptr = result.Data)
-        {
-            _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgb, (uint)result.Width,
-                (uint)result.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
-        }
-    
-        SetParameters();
-    }
-    public unsafe BaseTexture(GL gl, string[] filepath, TextureType _type = TextureType.Cubemap) 
-    { 
-        _gl = gl;
-        _texture = _gl.GenTexture();
-        // remember this is a cubemap texture
-        Type = _type;
-        // store a simple path string (first face) for diagnostics
-        
 
-        Console.WriteLine($"[BaseTexture] Generated texture id {_texture} for cubemap. Binding...");
-        // Ensure the correct target is bound for cubemap uploads
         Bind();
 
-        for (int i = 0; i < 6; i++)
+        switch (_type)
         {
-            Path = new string[i];
-            Path = filepath;
-            string path = filepath[i];
-            Console.WriteLine($"[BaseTexture] Loading cubemap face {i}: {path}");
-            ImageResult img = ImageResult.FromMemory(System.IO.File.ReadAllBytes(path), ColorComponents.RedGreenBlue);
+            case TextureType.Cubemap:
+                for (int i = 0; i < 6; i++)
+                {
+                    Path = new string[i];
+                    Path = filepath;
+                    string path = filepath[i];
+                    ImageResult img = ImageResult.FromMemory(System.IO.File.ReadAllBytes(path), ColorComponents.RedGreenBlue);
 
-            fixed (byte* ptr = img.Data)
-            {
-                _gl.TexImage2D(
-                    TextureTarget.TextureCubeMapPositiveX + i,
-                    0,
-                    InternalFormat.Rgb,
-                    (uint)img.Width,
-                    (uint)img.Height,
-                    0,
-                    PixelFormat.Rgb,
-                    PixelType.UnsignedByte,
-                    ptr
-                );
-            }
-            var err = _gl.GetError();
-            if (err != GLEnum.NoError)
-            {
-                Console.WriteLine($"[BaseTexture] GL error after face {i} upload: " + err);
-            }
-            else
-            {
-                Console.WriteLine($"[BaseTexture] Uploaded face {i} OK");
-            }
+                    fixed (byte* ptr = img.Data)
+                    {
+                        _gl.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, InternalFormat.Rgb, (uint)img.Width, (uint)img.Height, 0, 
+                            PixelFormat.Rgb, PixelType.UnsignedByte, ptr
+                        );
+                    }
+                }
+            break;
+
+            case TextureType.Color:
+                Path = filepath;
+                ImageResult result = ImageResult.FromMemory(System.IO.File.ReadAllBytes(filepath[0]), ColorComponents.RedGreenBlueAlpha);
+                fixed (byte* ptr = result.Data)
+                {
+                    _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgb, (uint)result.Width,
+                        (uint)result.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+                }
+                break;
         }
+
 
         SetParameters();
     }

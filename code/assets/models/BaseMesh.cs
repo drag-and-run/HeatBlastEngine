@@ -55,6 +55,9 @@ namespace HeatBlastEngine.code.assets.models
             VAO.VertexAttributePointer(1, 2, VertexAttribPointerType.Float, 11, 9); // texcoord (uv)
             VAO.VertexAttributePointer(2, 3, VertexAttribPointerType.Float, 11, 6); // color
             VAO.VertexAttributePointer(3, 3, VertexAttribPointerType.Float, 11, 3); // normal (unused by shader)
+            
+            // Unbind VAO to prevent state pollution when setting up other meshes
+            _gl.BindVertexArray(0);
         }
 
         public void Bind()

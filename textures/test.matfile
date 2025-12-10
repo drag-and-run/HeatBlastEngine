@@ -7,7 +7,7 @@
   "Texture": {
     "Type": "Color",
     "Path": [
-      "textures/dev/dev_color.png"
+      "textures/test.png"
     ]
   }
 }

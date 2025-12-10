@@ -113,50 +113,47 @@ public class Program
 
         _controller = new ImGuiController(_gl, _window, input);
 
+        /*
+        var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
+            new BaseTexture(_gl, "textures/test.png", TextureType.Color), "test_material");
+        
+        string json = JsonSerializer.Serialize(mat, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText("textures/test.matfile", json);
+        
+        string[] cubemap = new string[]
+        {
+            "textures/skybox/px.png", 
+            "textures/skybox/nx.png",
+            "textures/skybox/py.png", //Top
+            "textures/skybox/ny.png", //Bottom
+            "textures/skybox/pz.png",
+            "textures/skybox/nz.png",
+        
+        };
+        
+        var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
+           new BaseTexture(_gl, cubemap), "sky_material");
+        
+        string jsonsky = JsonSerializer.Serialize(skybox, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText("textures/skybox.matfile", jsonsky);
+        */
 
-        //var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
-        //    new BaseTexture(_gl, "textures/test.png", TextureType.Color), "test_material");
-        //
-        //string json = JsonSerializer.Serialize(mat, new JsonSerializerOptions { WriteIndented = true });
-        //File.WriteAllText("textures/test.matfile", json);
-        //
-        //string[] cubemap = new string[]
-        //{
-        //    "textures/skybox/px.png", 
-        //    "textures/skybox/nx.png",
-        //    "textures/skybox/py.png", //Top
-        //    "textures/skybox/ny.png", //Bottom
-        //    "textures/skybox/pz.png",
-        //    "textures/skybox/nz.png",
-        //
-        //};
-        //
-        //var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
-        //   new BaseTexture(_gl, cubemap), "sky_material");
-        //
-        //string jsonsky = JsonSerializer.Serialize(skybox, new JsonSerializerOptions { WriteIndented = true });
-        //File.WriteAllText("textures/skybox.matfile", jsonsky);
+        var mat = BaseMaterial.LoadFromFile("textures/test.matfile", _gl);
+        var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
+        var plane_mdl = new Model(_gl, "models/editor/plane.obj");
+        _entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
 
 
+        var cubebox_mdl = new Model(_gl, "models/test.obj");
+        _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(Vector3.Zero)));
 
         var skymat = BaseMaterial.LoadFromFile("textures/skybox.matfile", _gl);
         var skymdl = new Model(_gl, "models/editor/cube.obj");
+        
         _entities.Add(new SkyEntity(skymat, skymdl,  new Transform(Vector3.Zero)));
-
-       //var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
-       //var plane_mdl = new Model(_gl, "models/editor/plane.obj");
-       //_entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
-
-       var mat = BaseMaterial.LoadFromFile("textures/test.matfile", _gl);
-       var cubebox_mdl = new Model(_gl, "models/test.obj");
-       _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(Vector3.Zero)));
-
 
 
         _Light = new LightObject(new Transform(new Vector3(0,0,0)));
-
-
-
     }
 
     

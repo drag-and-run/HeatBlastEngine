@@ -38,17 +38,10 @@ namespace HeatBlastEngine.code.assets
                 Console.WriteLine($"faile to load material{filepath}");
                 return null;
             }
-            BaseMaterial material = JsonSerializer.Deserialize<BaseMaterial>(jsonString)!;
-            if (material.Texture.Type == TextureType.Cubemap)
-            {
+            BaseMaterial material = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
                 return new BaseMaterial(new BaseShader(_gl, material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
                     new BaseTexture(_gl, material.Texture.Path, material.Texture.Type), material.Name);
-            }
-            else
-            {
-                return new BaseMaterial(new BaseShader(_gl, material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
-                    new BaseTexture(_gl, material.Texture.Path[0], material.Texture.Type), material.Name);
-            }
+
         }
 
         public void Use()
