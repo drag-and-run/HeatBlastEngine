@@ -37,8 +37,6 @@ public class BaseEntity : IDisposable
             Console.WriteLine($"[BaseEntity] Exception during Material.Use() for entity {uid}: {ex.Message}\n{ex.StackTrace}");
             throw;
         }
-
- 
     }
 
 
@@ -62,9 +60,10 @@ public class BaseEntity : IDisposable
             Material.Shader.SetUniform("uModel", model);
             Material.Shader.SetUniform("uView", view);
             Material.Shader.SetUniform("uProjection", projection);
-            
+
 
             // We have an EBO (indices). Draw using DrawElements with the index count.
+            
             _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
 
         }

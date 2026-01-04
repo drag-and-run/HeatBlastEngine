@@ -1,0 +1,11 @@
+{
+  "Name": "test_material",
+  "Shader": {
+    "vertexShaderPath": null,
+    "fragmentShaderPath": null
+  },
+  "Texture": {
+    "Type": "Color",
+    "Path": null
+  }
+}

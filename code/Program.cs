@@ -138,10 +138,10 @@ public class Program
         File.WriteAllText("textures/skybox.matfile", jsonsky);
         */
 
-        var mat = BaseMaterial.LoadFromFile("textures/test.matfile", _gl);
-        var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
-        var plane_mdl = new Model(_gl, "models/editor/plane.obj");
-        _entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
+        var mat = BaseMaterial.LoadFromFile("textures/default_material.matfile", _gl);
+        //var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
+        //var plane_mdl = new Model(_gl, "models/editor/plane.obj");
+        //_entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
 
 
         var cubebox_mdl = new Model(_gl, "models/test.obj");
@@ -154,6 +154,7 @@ public class Program
 
 
         _Light = new LightObject(new Transform(new Vector3(0,0,0)));
+
     }
 
     
@@ -223,7 +224,7 @@ public class Program
             ImGui.Text($"{ent.ToString()} Name: {ent.Name}");
         }
 
-        ImGui.SliderInt("t", ref ENGINE_FPS, 5, 1000);
+        ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
         _window.FramesPerSecond = ENGINE_FPS;
 
 
@@ -237,10 +238,12 @@ public class Program
      
         ImGui.StyleColorsLight();
         ImGui.End();
+
         
         _controller.Render();
     }
     static bool isCursorVisible = false;
+    static bool drawWireframe = false;
     private static void KeyDown(IKeyboard keyboard, Key keyarg, int keyCode) 
     {
         Console.WriteLine("\u001b[36m" + "KEY PRESSED: " +keyarg.ToString() + " " + keyCode.ToString() + "\u001b[0m");
@@ -262,6 +265,11 @@ public class Program
             }
         }
 
+        if (keyarg == Key.V)
+        {
+            drawWireframe = !drawWireframe;
+            _gl.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+        }
     }
 
     private static void OnClose()
