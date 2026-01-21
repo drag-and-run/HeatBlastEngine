@@ -18,6 +18,7 @@
 	  <HeatBlastShaderFiles Include="$(SolutionDir)\shaders\**\*" />
 	  <HeatBlastTextureFiles Include="$(SolutionDir)\textures\**\*" />
 	  <HeatBlastModelFiles Include="$(SolutionDir)\models\**\*" />
+	  <SteamWorks Include="$(SolutionDir)\steamworks\redistributable_bin\win64\steam_api64.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,10 +26,17 @@
     <Folder Include="code\imgui\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Facepunch.Steamworks.Win64">
+      <HintPath>steamworks\Facepunch.Steamworks.Win64.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
 	  <Copy SourceFiles="@(HeatBlastShaderFiles)" DestinationFolder="$(TargetDir)\shaders\%(RecursiveDir)" />
 	  <Copy SourceFiles="@(HeatBlastTextureFiles)" DestinationFolder="$(TargetDir)\textures\%(RecursiveDir)" />
 	  <Copy SourceFiles="@(HeatBlastModelFiles)" DestinationFolder="$(TargetDir)\models\%(RecursiveDir)" />
+	  <Copy SourceFiles="@(SteamWorks)" DestinationFolder="$(TargetDir)" />
   </Target>
 
 	

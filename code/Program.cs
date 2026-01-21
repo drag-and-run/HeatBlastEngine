@@ -1,5 +1,6 @@
 ﻿using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
+using HeatBlastEngine.code.Core.Entities;
 using HeatBlastEngine.code.Core.Entities.Lights;
 using ImGuiNET;
 using Sandbox;
@@ -13,6 +14,8 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using Steamworks;
 
 
 public class Program
@@ -40,6 +43,14 @@ public class Program
 
     public static void Main(string[] args)
     {
+        try 
+        {
+            SteamClient.Init( 480 );
+        }
+        catch ( System.Exception e )
+        {
+            Console.WriteLine(e.Message);
+        }
         WindowOptions options = WindowOptions.Default with
         {
             Size = new Vector2D<int>(1920, 1080),
@@ -58,7 +69,7 @@ public class Program
 
         _window.Run();
 
-        
+
     }
 
 
@@ -102,7 +113,6 @@ public class Program
         _gl.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
         {
             string msg = Marshal.PtrToStringAnsi(message, length);
-            Console.WriteLine($"OpenGL Debug: {msg}, Severity: {severity}");
         }, IntPtr.Zero);
         #endregion
 
@@ -145,12 +155,13 @@ public class Program
 
 
         var cubebox_mdl = new Model(_gl, "models/test.obj");
-        _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(Vector3.Zero)));
+        _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(new Vector3(2,2,0))));
 
         var skymat = BaseMaterial.LoadFromFile("textures/skybox.matfile", _gl);
         var skymdl = new Model(_gl, "models/editor/cube.obj");
         
-        _entities.Add(new SkyEntity(skymat, skymdl,  new Transform(Vector3.Zero)));
+        _entities.Add(new SkyEntity(skymat, skymdl,  new Transform(Vector3.Zero )));
+        _entities.Add(new BoundingBox(mat, new Model(_gl,"models/editor/bbox.obj"),Transform.Identity));
 
 
         _Light = new LightObject(new Transform(new Vector3(0,0,0)));
