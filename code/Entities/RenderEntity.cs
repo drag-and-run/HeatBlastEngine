@@ -21,6 +21,10 @@ public class RenderEntity : Entity, IDisposable
         Name = _name;
     }
 
+    public override void OnRender(double deltaTime)
+    {
+        Render(GameState.ActiveMap.camera, Renderer._window, GameState.ActiveMap._Light);
+    }
 
     public virtual unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, LightObject _light)
     {

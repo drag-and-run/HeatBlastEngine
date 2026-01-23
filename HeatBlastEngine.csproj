@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="code\imgui\" />
+    <Folder Include="Code\imgui\" />
   </ItemGroup>
 
   <ItemGroup>
