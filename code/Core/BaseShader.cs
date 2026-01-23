@@ -17,15 +17,15 @@ namespace HeatBlastEngine.code.Core
 
         public BaseShader() { }
 
-        public BaseShader(GL gl, string vertexPath, string fragmentPath)
+        public BaseShader(string vertexPath, string fragmentPath)
         {
             vertexShaderPath = vertexPath;
             fragmentShaderPath = fragmentPath;
-            _gl = gl;
+            _gl = Renderer._gl;
             
             uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);
             uint fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
-            _handle = gl.CreateProgram();
+            _handle = Renderer._gl.CreateProgram();
 
             _gl.AttachShader(_handle, vertex);
             _gl.AttachShader(_handle, fragment);

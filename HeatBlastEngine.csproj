@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="code\Core\Interfaces\" />
     <Folder Include="code\imgui\" />
   </ItemGroup>
 

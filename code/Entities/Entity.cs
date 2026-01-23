@@ -8,7 +8,7 @@ using Silk.NET.Windowing;
 using System.Numerics;
 
 
-public class BaseEntity : IDisposable
+public class Entity : IDisposable
 {
     public string Name;
     public Guid uid =  Guid.NewGuid();
@@ -18,7 +18,7 @@ public class BaseEntity : IDisposable
     public BaseMaterial Material;
     public Model Model;
 
-    public BaseEntity(BaseMaterial _material, Model _model, Transform _transform, string _name = "default", GL _gl = null)
+    public Entity(BaseMaterial _material, Model _model, Transform _transform, string _name = "default", GL _gl = null)
     {
 
         Console.WriteLine(uid);

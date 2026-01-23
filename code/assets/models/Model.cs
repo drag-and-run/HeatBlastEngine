@@ -2,6 +2,7 @@
 using Silk.NET.Assimp;
 using Silk.NET.OpenGL;
 using System.Numerics;
+using HeatBlastEngine.code.Core;
 
 public class Model : IDisposable
 {
@@ -9,11 +10,11 @@ public class Model : IDisposable
     private Assimp _assimp;
     public string Directory { get; protected set; } = string.Empty;
     public List<BaseMesh> Meshes { get; protected set; } = new List<BaseMesh>();
-    public Model(GL gl, string filepath, bool gamma = false)
+    public Model( string filepath, bool gamma = false)
     {
         var assimp = Silk.NET.Assimp.Assimp.GetApi();
         _assimp = assimp;
-        _gl = gl;
+        _gl = Renderer._gl;
         LoadModel(filepath);
     }
 

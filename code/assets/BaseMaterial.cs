@@ -30,7 +30,7 @@ namespace HeatBlastEngine.code.assets
 
         }
 
-        public static BaseMaterial LoadFromFile(string filepath, GL _gl)
+        public static BaseMaterial LoadFromFile(string filepath)
         {
             string jsonString = File.ReadAllText(filepath);
             if (jsonString is null)
@@ -39,8 +39,8 @@ namespace HeatBlastEngine.code.assets
                 return null;
             }
             BaseMaterial material = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
-                return new BaseMaterial(new BaseShader(_gl, material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
-                    new BaseTexture(_gl, material.Texture.Path, material.Texture.Type), material.Name);
+                return new BaseMaterial(new BaseShader(material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
+                    new BaseTexture(Renderer._gl, material.Texture.Path, material.Texture.Type), material.Name);
 
         }
 

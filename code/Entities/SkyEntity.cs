@@ -8,7 +8,7 @@ using Silk.NET.Windowing;
 using System.Numerics;
 
 
-public class SkyEntity : BaseEntity, IDisposable
+public class SkyEntity : Entity, IDisposable
 {
     public SkyEntity(BaseMaterial _material, Model _model, Transform _transform, string _name = "default", GL _gl = null) : base(_material, _model, _transform, _name, _gl)
     {

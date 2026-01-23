@@ -14,7 +14,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using HeatBlastEngine.code.maps;
 using Steamworks;
 
 
@@ -24,33 +24,39 @@ public class Program
     public static int ENGINE_FPS = 140;
 
     private static IWindow _window;
-    private static GL _gl;
+    
     private static ImGuiController _controller;
 
 
     private static IKeyboard primaryKeyboard;
     private static IMouse primaryMouse;
 
-    private static Camera camera;
+    
     private static Vector2 LastMousePosition;
     private static float lookSensitivity = 0.1f;
 
-    private static List<BaseEntity> _entities = new List<BaseEntity>();
-
-    private static LightObject _Light;
+    public static GameMap ActiveMap;
 
     
 
     public static void Main(string[] args)
     {
-        try 
+        #region steam
+        if (args.Contains("-steam"))
         {
-            SteamClient.Init( 480 );
+            Console.WriteLine("INITIALIZING STEAM");
+            try 
+            {
+                SteamClient.Init( 480 );
+            }
+            catch ( System.Exception e )
+            {
+                Console.WriteLine(e.Message);
+            }
         }
-        catch ( System.Exception e )
-        {
-            Console.WriteLine(e.Message);
-        }
+        #endregion
+        
+        #region window
         WindowOptions options = WindowOptions.Default with
         {
             Size = new Vector2D<int>(1920, 1080),
@@ -68,18 +74,14 @@ public class Program
         _window.Closing += OnClose;
 
         _window.Run();
-
-
+        #endregion
     }
-
-
-
-
     private static void OnFramebufferResize(Vector2D<int> newsize)
     {
-        _gl.Viewport(newsize);
+        Renderer._gl.Viewport(newsize);
     }
 
+    
     private static unsafe void OnLoad() 
     {
 
@@ -101,71 +103,27 @@ public class Program
         #endregion
 
         #region opengl init flags
-        _gl = _window.CreateOpenGL();
-        _gl.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
+        Renderer._gl = _window.CreateOpenGL();
+        Renderer._gl.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
 
-        _gl.Enable(EnableCap.Blend);
-        _gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-        _gl.Enable(GLEnum.CullFace);
-        _gl.Enable(EnableCap.Multisample);
-        _gl.Enable(GLEnum.DepthTest);
-        _gl.Enable(GLEnum.DebugOutput);
-        _gl.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
+        Renderer._gl.Enable(EnableCap.Blend);
+        Renderer._gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        Renderer._gl.Enable(GLEnum.CullFace);
+        Renderer._gl.Enable(EnableCap.Multisample);
+        Renderer._gl.Enable(GLEnum.DepthTest);
+        Renderer._gl.Enable(GLEnum.DebugOutput);
+        Renderer._gl.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
         {
             string msg = Marshal.PtrToStringAnsi(message, length);
         }, IntPtr.Zero);
         #endregion
 
-
-
-        camera = new Camera();
-        camera.Transform.Position = new Vector3(0, 1, 2);
-
-        _controller = new ImGuiController(_gl, _window, input);
-
-        /*
-        var mat = new BaseMaterial( new BaseShader(_gl, "shaders/vertshader.glsl", "shaders/frag_light_basic.glsl"), 
-            new BaseTexture(_gl, "textures/test.png", TextureType.Color), "test_material");
+        //Initialized a map and adds all the entities ther
+        //TODO: parser/editor for that
+        ActiveMap = new GameMap();
         
-        string json = JsonSerializer.Serialize(mat, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText("textures/test.matfile", json);
-        
-        string[] cubemap = new string[]
-        {
-            "textures/skybox/px.png", 
-            "textures/skybox/nx.png",
-            "textures/skybox/py.png", //Top
-            "textures/skybox/ny.png", //Bottom
-            "textures/skybox/pz.png",
-            "textures/skybox/nz.png",
-        
-        };
-        
-        var skybox = new BaseMaterial(new BaseShader(_gl, "shaders/vert_cubemap.glsl", "shaders/frag_cubemap.glsl"),
-           new BaseTexture(_gl, cubemap), "sky_material");
-        
-        string jsonsky = JsonSerializer.Serialize(skybox, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText("textures/skybox.matfile", jsonsky);
-        */
-
-        var mat = BaseMaterial.LoadFromFile("textures/default_material.matfile", _gl);
-        //var planemat = BaseMaterial.LoadFromFile("textures/plane.matfile", _gl);
-        //var plane_mdl = new Model(_gl, "models/editor/plane.obj");
-        //_entities.Add(new BaseEntity(planemat, plane_mdl, new Transform(Vector3.Zero)));
-
-
-        var cubebox_mdl = new Model(_gl, "models/test.obj");
-        _entities.Add(new BaseEntity(mat, cubebox_mdl, new Transform(new Vector3(2,2,0))));
-
-        var skymat = BaseMaterial.LoadFromFile("textures/skybox.matfile", _gl);
-        var skymdl = new Model(_gl, "models/editor/cube.obj");
-        
-        _entities.Add(new SkyEntity(skymat, skymdl,  new Transform(Vector3.Zero )));
-        _entities.Add(new BoundingBox(mat, new Model(_gl,"models/editor/bbox.obj"),Transform.Identity));
-
-
-        _Light = new LightObject(new Transform(new Vector3(0,0,0)));
-
+        //Imgui
+        _controller = new ImGuiController(Renderer._gl, _window, input);
     }
 
     
@@ -180,16 +138,16 @@ public class Program
             var yOffset = (position.Y - LastMousePosition.Y) * lookSensitivity;
             LastMousePosition = position;
 
-            camera.Yaw += xOffset;
-            camera.Pitch -= yOffset;
+            ActiveMap.camera.Yaw += xOffset;
+            ActiveMap.camera.Pitch -= yOffset;
 
-            camera.Pitch = Math.Clamp(camera.Pitch, -89f, 89f);
+            ActiveMap.camera.Pitch = Math.Clamp(ActiveMap.camera.Pitch, -89f, 89f);
 
-            camera.Direction.X = MathF.Cos(float.DegreesToRadians( camera.Yaw)) * MathF.Cos(float.DegreesToRadians(camera.Pitch));
-            camera.Direction.Y = MathF.Sin(float.DegreesToRadians(camera.Pitch));
-            camera.Direction.Z = MathF.Sin(float.DegreesToRadians( camera.Yaw)) * MathF.Cos(float.DegreesToRadians(camera.Pitch));
+            ActiveMap.camera.Direction.X = MathF.Cos(float.DegreesToRadians( ActiveMap.camera.Yaw)) * MathF.Cos(float.DegreesToRadians(ActiveMap.camera.Pitch));
+            ActiveMap.camera.Direction.Y = MathF.Sin(float.DegreesToRadians(ActiveMap.camera.Pitch));
+            ActiveMap.camera.Direction.Z = MathF.Sin(float.DegreesToRadians( ActiveMap.camera.Yaw)) * MathF.Cos(float.DegreesToRadians(ActiveMap.camera.Pitch));
 
-            camera.Front = Vector3.Normalize(camera.Direction);
+            ActiveMap.camera.Front = Vector3.Normalize(ActiveMap.camera.Direction);
         }
     }
 
@@ -198,23 +156,23 @@ public class Program
         var speed = 5f * (float)deltaTime;
         if (primaryKeyboard.IsKeyPressed(Key.W))
         {
-            camera.Transform.Position += speed * camera.Front;
+            ActiveMap.camera.Transform.Position += speed * ActiveMap.camera.Front;
         }
         if (primaryKeyboard.IsKeyPressed(Key.S))
         {
 
-            camera.Transform.Position -= speed * camera.Front;
+            ActiveMap.camera.Transform.Position -= speed * ActiveMap.camera.Front;
         }
         if (primaryKeyboard.IsKeyPressed(Key.D))
         {
-            camera.Transform.Position += Vector3.Normalize(Vector3.Cross(camera.Front, camera.Transform.Up)) * speed;
+            ActiveMap.camera.Transform.Position += Vector3.Normalize(Vector3.Cross(ActiveMap.camera.Front, ActiveMap.camera.Transform.Up)) * speed;
         }
         if (primaryKeyboard.IsKeyPressed(Key.A))
         {
-            camera.Transform.Position -= Vector3.Normalize(Vector3.Cross(camera.Front, camera.Transform.Up)) * speed;
+            ActiveMap.camera.Transform.Position -= Vector3.Normalize(Vector3.Cross(ActiveMap.camera.Front, ActiveMap.camera.Transform.Up)) * speed;
         }
 
-        _Light.Transform.Position = camera.Transform.Position;
+        ActiveMap._Light.Transform.Position = ActiveMap.camera.Transform.Position;
     }
 
     static TimeSince updatestats = 0;
@@ -223,15 +181,15 @@ public class Program
         BaseTime.Elapsed = (float)_window.Time;
         BaseTime.FPS = 1 / deltaTime;
 
-        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        _gl.ClearDepth(1f);
+        Renderer._gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        Renderer._gl.ClearDepth(1f);
 
         _controller.Update((float)deltaTime);
         ImGui.Begin("DEBUG");
-        foreach (BaseEntity ent in _entities)
+        foreach (Entity ent in ActiveMap._entities)
         {
             if (ent is null) return;
-            ent.Render(camera, _window, _gl, _Light);
+            ent.Render(ActiveMap.camera, _window, Renderer._gl, ActiveMap._Light);
             ImGui.Text($"{ent.ToString()} Name: {ent.Name}");
         }
 
@@ -279,13 +237,13 @@ public class Program
         if (keyarg == Key.V)
         {
             drawWireframe = !drawWireframe;
-            _gl.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+            Renderer._gl.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
         }
     }
 
     private static void OnClose()
     {
-        foreach (BaseEntity ent in _entities)
+        foreach (Entity ent in ActiveMap._entities)
         {
             if (ent is null) return;
                ent.Dispose();
