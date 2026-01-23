@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace HeatBlastEngine.code.assets
 {
-    public class BaseMaterial
+    public class Material
     {
         public string Name { get; set; }
         public BaseShader Shader { get; set; }
@@ -18,19 +18,19 @@ namespace HeatBlastEngine.code.assets
 
 
 
-        public BaseMaterial(BaseShader _shader, BaseTexture _texture, string _name = "default_material")
+        public Material(BaseShader _shader, BaseTexture _texture, string _name = "default_material")
         {
             Texture = _texture;
             Shader = _shader;
             Name = _name;
         }
         [JsonConstructor]
-        public BaseMaterial()
+        public Material()
         {
 
         }
 
-        public static BaseMaterial LoadFromFile(string filepath)
+        public static Material LoadFromFile(string filepath)
         {
             string jsonString = File.ReadAllText(filepath);
             if (jsonString is null)
@@ -38,9 +38,9 @@ namespace HeatBlastEngine.code.assets
                 Console.WriteLine($"faile to load material{filepath}");
                 return null;
             }
-            BaseMaterial material = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
-                return new BaseMaterial(new BaseShader(material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
-                    new BaseTexture(Renderer._gl, material.Texture.Path, material.Texture.Type), material.Name);
+            Material material = JsonSerializer.Deserialize<Material>(jsonString);
+                return new Material(new BaseShader(material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
+                    new BaseTexture(Renderer.OpenGl, material.Texture.Path, material.Texture.Type), material.Name);
 
         }
 

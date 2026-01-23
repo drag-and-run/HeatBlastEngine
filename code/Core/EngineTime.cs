@@ -1,6 +1,6 @@
 ﻿
 
-public static class BaseTime
+public static class EngineTime
     {
         public static float Elapsed { get; set; }
 

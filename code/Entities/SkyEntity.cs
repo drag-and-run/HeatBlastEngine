@@ -8,14 +8,14 @@ using Silk.NET.Windowing;
 using System.Numerics;
 
 
-public class SkyEntity : Entity, IDisposable
+public class SkyEntity : RenderEntity
 {
-    public SkyEntity(BaseMaterial _material, Model _model, Transform _transform, string _name = "default", GL _gl = null) : base(_material, _model, _transform, _name, _gl)
+    public SkyEntity(Material _material, Model _model) : base(_material, _model)
     {
         
     }
 
-    public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, GL _gl, LightObject _light)
+    public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, LightObject _light)
     {
        
         var size = _window.FramebufferSize;
@@ -31,9 +31,9 @@ public class SkyEntity : Entity, IDisposable
             Material.Shader.SetUniform("uView", view);
             Material.Shader.SetUniform("uProjection", projection);
 
-            _gl.DepthFunc(GLEnum.Lequal);
-            _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
-            _gl.DepthFunc(GLEnum.Less);
+            Renderer.OpenGl.DepthFunc(GLEnum.Lequal);
+            Renderer.OpenGl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
+            Renderer.OpenGl.DepthFunc(GLEnum.Less);
         }
         
     }

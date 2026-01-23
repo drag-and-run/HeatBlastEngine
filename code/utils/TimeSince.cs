@@ -18,8 +18,8 @@ public struct TimeSince : IEquatable<TimeSince>
 {
 	float time;
 
-	public static implicit operator float( TimeSince ts ) => BaseTime.Elapsed - ts.time;
-	public static implicit operator TimeSince( float ts ) => new() { time = BaseTime.Elapsed - ts };
+	public static implicit operator float( TimeSince ts ) => EngineTime.Elapsed - ts.time;
+	public static implicit operator TimeSince( float ts ) => new() { time = EngineTime.Elapsed - ts };
 	public static bool operator <( in TimeSince ts, float f ) => ts.Relative < f;
 	public static bool operator >( in TimeSince ts, float f ) => ts.Relative > f;
 	public static bool operator <=( in TimeSince ts, float f ) => ts.Relative <= f;
@@ -66,8 +66,8 @@ public struct TimeUntil : IEquatable<TimeUntil>
 	private float time;
 	private float startTime;
 
-	public static implicit operator bool( TimeUntil ts ) => BaseTime.Elapsed >= ts.time;
-	public static implicit operator float( TimeUntil ts ) => ts.time - BaseTime.Elapsed;
+	public static implicit operator bool( TimeUntil ts ) => EngineTime.Elapsed >= ts.time;
+	public static implicit operator float( TimeUntil ts ) => ts.time - EngineTime.Elapsed;
 	public static bool operator <( in TimeUntil ts, float f ) => ts.Relative < f;
 	public static bool operator >( in TimeUntil ts, float f ) => ts.Relative > f;
 	public static bool operator <=( in TimeUntil ts, float f ) => ts.Relative <= f;
@@ -76,7 +76,7 @@ public struct TimeUntil : IEquatable<TimeUntil>
 	public static bool operator >( in TimeUntil ts, int f ) => ts.Relative > f;
 	public static bool operator <=( in TimeUntil ts, int f ) => ts.Relative <= f;
 	public static bool operator >=( in TimeUntil ts, int f ) => ts.Relative >= f;
-	public static implicit operator TimeUntil( float ts ) => new() { time = BaseTime.Elapsed + ts, startTime = BaseTime.Elapsed };
+	public static implicit operator TimeUntil( float ts ) => new() { time = EngineTime.Elapsed + ts, startTime = EngineTime.Elapsed };
 
 	/// <summary>
 	/// Time to which we are counting down to, based on <see cref="Time.Now"/>.
@@ -91,12 +91,12 @@ public struct TimeUntil : IEquatable<TimeUntil>
 	/// <summary>
 	/// Amount of seconds passed since the countdown started.
 	/// </summary>
-	public float Passed => (BaseTime.Elapsed - startTime);
+	public float Passed => (EngineTime.Elapsed - startTime);
 
 	/// <summary>
 	/// The countdown, but as a fraction, i.e. a value from 0 (start of countdown) to 1 (end of countdown)
 	/// </summary>
-	public float Fraction => Math.Clamp( (BaseTime.Elapsed - startTime) / (time - startTime), 0.0f, 1.0f );
+	public float Fraction => Math.Clamp( (EngineTime.Elapsed - startTime) / (time - startTime), 0.0f, 1.0f );
 
 	public override string ToString() => $"{Relative}";
 

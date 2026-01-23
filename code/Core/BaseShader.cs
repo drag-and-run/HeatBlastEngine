@@ -21,11 +21,11 @@ namespace HeatBlastEngine.code.Core
         {
             vertexShaderPath = vertexPath;
             fragmentShaderPath = fragmentPath;
-            _gl = Renderer._gl;
+            _gl = Renderer.OpenGl;
             
             uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);
             uint fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
-            _handle = Renderer._gl.CreateProgram();
+            _handle = Renderer.OpenGl.CreateProgram();
 
             _gl.AttachShader(_handle, vertex);
             _gl.AttachShader(_handle, fragment);

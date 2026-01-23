@@ -4,5 +4,5 @@ namespace HeatBlastEngine.code.Core;
 
 public static class Renderer
 {
-    public static GL _gl;
+    public static GL OpenGl;
 }
