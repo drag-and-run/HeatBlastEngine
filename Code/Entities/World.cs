@@ -2,6 +2,7 @@ using System.Numerics;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Core.Entities.Lights;
+using HeatBlastEngine.Code.Editor;
 using HeatBlastEngine.code.Entities;
 
 namespace HeatBlastEngine.code.maps;
@@ -26,9 +27,10 @@ public class World
         PointLight = new PointLight();
        
 
-        var mdl1 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        mdl2.Transform.Position = new Vector3(0, 5, 0);
+        //var mdl1 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        //var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        //mdl2.Transform.Position = new Vector3(2, 0, 0);
+        var axis = new MapAxis(Material.LoadFromFile("textures/editor/axis.matfile"),new Model("models/editor/axis.obj"));
     }
     
 

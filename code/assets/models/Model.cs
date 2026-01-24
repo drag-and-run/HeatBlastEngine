@@ -14,7 +14,7 @@ public class Model : IDisposable
     {
         var assimp = Silk.NET.Assimp.Assimp.GetApi();
         _assimp = assimp;
-        _gl = Renderer.OpenGl;
+        _gl = Renderer.GL;
         LoadModel(filepath);
         
     }

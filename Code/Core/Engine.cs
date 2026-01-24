@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core.Input;
+using HeatBlastEngine.Code.Editor;
 using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.Entities.Interfaces;
 using HeatBlastEngine.code.maps;
@@ -65,7 +66,7 @@ public class Engine
     
     private static void OnFramebufferResize(Vector2D<int> newsize)
     {
-        Renderer.OpenGl.Viewport(newsize);
+        Renderer.GL.Viewport(newsize);
     }
 
     
@@ -89,16 +90,16 @@ public class Engine
         #endregion
 
         #region opengl init flags
-        Renderer.OpenGl = Renderer._window.CreateOpenGL();
-        Renderer.OpenGl.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
+        Renderer.GL = Renderer._window.CreateOpenGL();
+        Renderer.GL.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
 
-        Renderer.OpenGl.Enable(EnableCap.Blend);
-        Renderer.OpenGl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-        Renderer.OpenGl.Enable(GLEnum.CullFace);
-        Renderer.OpenGl.Enable(EnableCap.Multisample);
-        Renderer.OpenGl.Enable(GLEnum.DepthTest);
-        Renderer.OpenGl.Enable(GLEnum.DebugOutput);
-        Renderer.OpenGl.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
+        Renderer.GL.Enable(EnableCap.Blend);
+        Renderer.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        Renderer.GL.Enable(GLEnum.CullFace);
+        Renderer.GL.Enable(EnableCap.Multisample);
+        Renderer.GL.Enable(GLEnum.DepthTest);
+        Renderer.GL.Enable(GLEnum.DebugOutput);
+        Renderer.GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
         {
             string msg = Marshal.PtrToStringAnsi(message, length);
         }, IntPtr.Zero);
@@ -110,7 +111,7 @@ public class Engine
         World.ActiveMap.LoadMap();
         
         //Imgui
-        _controller = new ImGuiController(Renderer.OpenGl, Renderer._window, input);
+        _controller = new ImGuiController(Renderer.GL, Renderer._window, input);
     }
 
     
@@ -130,7 +131,7 @@ public class Engine
             foreach (Entity entity in World.ActiveMap.Entities)
             {
                 entity.OnUpdate(deltaTime);
-                entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
+               // entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
             }
                 
         }
@@ -139,18 +140,23 @@ public class Engine
     
     private static unsafe void OnRender(double deltaTime) 
     {
-        EngineTime.Elapsed = (float)Renderer._window.Time;
-        EngineTime.FPS = 1 / deltaTime;
+        Time.Elapsed = (float)Renderer._window.Time;
+        Time.FPS = 1 / deltaTime;
 
-        Renderer.OpenGl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        Renderer.OpenGl.ClearDepth(1f);
+        Renderer.GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        Renderer.GL.ClearDepth(1f);
 
+
+        
         #if IMGUI
         _controller.Update((float)deltaTime);
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
-        ImGui.SliderFloat3("POS",ref newentpos,0,4);
 
+        if (World.ActiveMap.camera is not null)
+        {
+            ImGui.Text(World.ActiveMap.camera.Front.ToString());
+        }
 
         
         if (World.ActiveMap is not null)
@@ -192,6 +198,8 @@ public class Engine
         _controller.Render();
         #endif
 
+
+
     }
     static bool isCursorVisible = false;
     static bool drawWireframe = false;
@@ -221,7 +229,7 @@ public class Engine
         {
             
             drawWireframe = !drawWireframe;
-            Renderer.OpenGl.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+            Renderer.GL.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
         }
 
         switch (keyarg)
@@ -237,8 +245,8 @@ public class Engine
             case Key.G:
                 if (World.ActiveMap is null) return;
                 var ent = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),
-                    new Model("models/test.obj"), "CustomEntity");
-                    ent.Transform.Position = newentpos;
+                    new Model("models/monkey.obj"), "CustomEntity");
+                ent.Transform.Position = World.ActiveMap.camera.Transform.Position + World.ActiveMap.camera.Front * 5f;
                 break;
         }
     }

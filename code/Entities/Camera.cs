@@ -24,27 +24,26 @@ namespace HeatBlastEngine.code.Core
         public static float lookSensitivity = 0.1f;
 
         public Vector3 Direction = Vector3.Zero;
-
-        public Vector3 Front = new Vector3(0, 0, -1);
+        public Vector3 Front = new Vector3(0, 0, 0);
 
         public override void OnUpdate(double deltaTime)
         {
             var speed = 5f * (float)deltaTime;
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.W))
             {
-                World.ActiveMap.camera.Transform.Position += speed * World.ActiveMap.camera.Front;
+                Transform.Position += speed * Front;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.S))
             {
-                World.ActiveMap.camera.Transform.Position -= speed * World.ActiveMap.camera.Front;
+                Transform.Position -= speed * Front;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.D))
             {
-                World.ActiveMap.camera.Transform.Position += Vector3.Normalize(Vector3.Cross(World.ActiveMap.camera.Front, World.ActiveMap.camera.Transform.Up)) * speed;
+                Transform.Position += Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.A))
             {
-                World.ActiveMap.camera.Transform.Position -= Vector3.Normalize(Vector3.Cross(World.ActiveMap.camera.Front, World.ActiveMap.camera.Transform.Up)) * speed;
+                Transform.Position -= Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }
         }
 
@@ -58,16 +57,16 @@ namespace HeatBlastEngine.code.Core
                 var yOffset = (position.Y - LastMousePosition.Y) * lookSensitivity;
                 LastMousePosition = position;
 
-                World.ActiveMap.camera.Yaw += xOffset;
-                World.ActiveMap.camera.Pitch -= yOffset;
+                Yaw += xOffset;
+                Pitch -= yOffset;
 
-                World.ActiveMap.camera.Pitch = Math.Clamp(World.ActiveMap.camera.Pitch, -89f, 89f);
+                Pitch = Math.Clamp(Pitch, -89f, 89f);
 
-                World.ActiveMap.camera.Direction.X = MathF.Cos(float.DegreesToRadians( World.ActiveMap.camera.Yaw)) * MathF.Cos(float.DegreesToRadians(World.ActiveMap.camera.Pitch));
-                World.ActiveMap.camera.Direction.Y = MathF.Sin(float.DegreesToRadians(World.ActiveMap.camera.Pitch));
-                World.ActiveMap.camera.Direction.Z = MathF.Sin(float.DegreesToRadians( World.ActiveMap.camera.Yaw)) * MathF.Cos(float.DegreesToRadians(World.ActiveMap.camera.Pitch));
+                Direction.X = MathF.Cos(float.DegreesToRadians( Yaw)) * MathF.Cos(float.DegreesToRadians(Pitch));
+                Direction.Y = MathF.Sin(float.DegreesToRadians(Pitch));
+                Direction.Z = MathF.Sin(float.DegreesToRadians( Yaw)) * MathF.Cos(float.DegreesToRadians(Pitch));
 
-                World.ActiveMap.camera.Front = Vector3.Normalize(World.ActiveMap.camera.Direction);
+                Front = Vector3.Normalize(Direction);
             }
         }
     }

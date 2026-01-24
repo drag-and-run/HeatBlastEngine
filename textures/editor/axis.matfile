@@ -1,0 +1,13 @@
+{
+  "Name": "test_material",
+  "Shader": {
+    "vertexShaderPath": "shaders/vertshader.glsl",
+    "fragmentShaderPath": "shaders/frag_line.glsl"
+  },
+  "Texture": {
+    "Type": "Color",
+    "Path": [
+      "textures/colorgrid.png"
+    ]
+  }
+}

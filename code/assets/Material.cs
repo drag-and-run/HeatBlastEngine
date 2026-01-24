@@ -39,8 +39,9 @@ namespace HeatBlastEngine.code.assets
                 return null;
             }
             Material material = JsonSerializer.Deserialize<Material>(jsonString);
+            //TODO: Handle textureless materials
                 return new Material(new BaseShader(material.Shader.vertexShaderPath, material.Shader.fragmentShaderPath),
-                    new BaseTexture(Renderer.OpenGl, material.Texture.Path, material.Texture.Type), material.Name);
+                    new BaseTexture(Renderer.GL, material.Texture.Path, material.Texture.Type), material.Name);
 
         }
 

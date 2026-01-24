@@ -6,6 +6,6 @@ namespace HeatBlastEngine.code.Core;
 
 public static class Renderer
 {
-    public static GL OpenGl;
+    public static GL GL;
     public static IWindow _window;
 }
