@@ -6,16 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HeatBlastEngine.code.Entities;
 
 namespace HeatBlastEngine.code.Core.Entities.Lights
 {
-    public class LightObject 
+    public class PointLight : Entity
     {
-        public Transform Transform = new Transform();
-
-        public LightObject(Transform _transform) 
-        {
-            Transform = _transform;
-        }
+ 
     }
 }

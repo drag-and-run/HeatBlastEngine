@@ -1,3 +1,7 @@
+using HeatBlastEngine.code.Core;
+using HeatBlastEngine.code.maps;
+using Silk.NET.OpenGL;
+
 namespace HeatBlastEngine.code.Entities;
 
 public class Entity
@@ -9,6 +13,9 @@ public class Entity
     public Entity() 
     {
         Transform = new Transform();
+        World.ActiveMap.Entities.Add(this);
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"Entity created: {Name} {this.GetType()}");
     }
 
     public virtual void OnUpdate(double deltaTime)

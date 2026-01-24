@@ -29,14 +29,14 @@ public class LegacyEntity : IDisposable
     }
 
 
-    public virtual unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, GL _gl, LightObject _light)
+    public virtual unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, GL _gl, PointLight pointLight)
     {
         var size = _window.FramebufferSize;
         var model = Matrix4x4.CreateFromQuaternion(Transform.Rotation) * Matrix4x4.CreateTranslation(Transform.Position);
         var view = Matrix4x4.CreateLookAt(camera.Transform.Position, camera.Transform.Position + camera.Front, camera.Transform.Up);
         var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
         Material.Shader.Use();
-        Material.Shader.SetUniform("ulightPos", _light.Transform.Position);
+        Material.Shader.SetUniform("ulightPos", pointLight.Transform.Position);
         Material.Shader.SetUniform("uViewPos", camera.Transform.Position);
         foreach (var mesh in Model.Meshes)
         {

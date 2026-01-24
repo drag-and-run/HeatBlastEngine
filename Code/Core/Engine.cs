@@ -1,3 +1,5 @@
+
+
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -12,8 +14,8 @@ using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 using Steamworks;
-
 namespace HeatBlastEngine.code.Core;
+
 
 public class Engine
 {
@@ -21,9 +23,10 @@ public class Engine
     public static int ENGINE_FPS = 140;
     private static ImGuiController _controller;
     
+    
     public Engine(string[] args)
     {
-        #region steam
+        #if STEAMWORKS
         if (args.Contains("-steam"))
         {
             Console.WriteLine("INITIALIZING STEAM");
@@ -36,7 +39,7 @@ public class Engine
                 Console.WriteLine(e.Message);
             }
         }
-        #endregion
+        #endif
         
         #region window
         WindowOptions options = WindowOptions.Default with
@@ -67,7 +70,6 @@ public class Engine
     
     private static unsafe void OnLoad() 
     {
-
         #region input 
         IInputContext input = Renderer._window.CreateInput();
         for (int i = 0; i < input.Keyboards.Count; i++)
@@ -103,7 +105,8 @@ public class Engine
 
         //Initializes a map and adds all the entities there
         //TODO: parser/editor for that
-        GameState.ActiveMap = new GameMap();
+        World.ActiveMap = new World();
+        World.ActiveMap.LoadMap();
         
         //Imgui
         _controller = new ImGuiController(Renderer.OpenGl, Renderer._window, input);
@@ -112,14 +115,20 @@ public class Engine
     
     private static void OnMouseMove(IMouse mouse, Vector2 position)
     {
-        foreach (IMouseMove entity in GameState.ActiveMap.Entities.OfType<IMouseMove>())
-            entity.OnMouseMove(mouse, position);
+        if (World.ActiveMap is not null)
+        {
+            foreach (IMouseMove entity in World.ActiveMap.Entities.OfType<IMouseMove>())
+                entity?.OnMouseMove(mouse, position);
+        }
     }
 
     private static void OnUpdate(double deltaTime) 
     {
-        foreach (Entity entity in GameState.ActiveMap.Entities) 
-            entity.OnUpdate(deltaTime);
+        if (World.ActiveMap is not null)
+        {
+            foreach (Entity entity in World.ActiveMap.Entities) 
+                entity.OnUpdate(deltaTime); 
+        }
     }
 
     
@@ -130,13 +139,33 @@ public class Engine
 
         Renderer.OpenGl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         Renderer.OpenGl.ClearDepth(1f);
-        
-        foreach (RenderEntity entity in GameState.ActiveMap.Entities.OfType<RenderEntity>())
-            entity.OnRender(deltaTime);
-        
+
         _controller.Update((float)deltaTime);
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
+        
+        
+        if (World.ActiveMap is not null)
+        {
+            foreach (Entity entity in World.ActiveMap.Entities)
+            {
+                entity.OnRender(deltaTime); 
+                ImGui.Text(entity.ToString());
+            }
+        }
+
+            
+        
+
+        if (World.ActiveMap is not null)
+        {
+            ImGui.Text(World.ActiveMap.ToString());
+        }
+        else
+        {
+            ImGui.Text("NO MAP LOADED");
+        }
+        
         Renderer._window.FramesPerSecond = ENGINE_FPS;
         
         ImGui.StyleColorsLight();
@@ -165,17 +194,25 @@ public class Engine
 
         if (keyarg == Key.V)
         {
+            
             drawWireframe = !drawWireframe;
             Renderer.OpenGl.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+        }
+
+        switch (keyarg)
+        {
+            case Key.X:
+                World.ActiveMap.UnloadMap();
+                break;
+            case Key.R:
+                World.ActiveMap = new World();
+                World.ActiveMap.LoadMap();
+                break;
         }
     }
 
     private static void OnClose()
     {
-        foreach (IDisposable entity in GameState.ActiveMap.Entities.OfType<IDisposable>())
-        {
-            entity.Dispose();
-            Console.WriteLine($"{entity.GetType().Name} disposed");
-        }
+
     }
 }

@@ -15,7 +15,7 @@ public class SkyEntity : RenderEntity
         
     }
 
-    public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, LightObject _light)
+    public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
     {
        
         var size = _window.FramebufferSize;
