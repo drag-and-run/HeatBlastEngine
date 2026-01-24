@@ -34,12 +34,14 @@ public class Engine
             Console.WriteLine("INITIALIZING STEAM");
             try 
             {
-                SteamClient.Init( 480 );
+                SteamClient.Init( 4219140 );
             }
             catch ( System.Exception e )
             {
                 Console.WriteLine(e.Message);
             }
+            
+            SteamFriends.SetRichPresence("steam_display", "#dev_map");
         }
         #endif
         
@@ -131,7 +133,7 @@ public class Engine
             foreach (Entity entity in World.ActiveMap.Entities)
             {
                 entity.OnUpdate(deltaTime);
-               // entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
+                //entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
             }
                 
         }
@@ -153,10 +155,7 @@ public class Engine
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
 
-        if (World.ActiveMap.camera is not null)
-        {
-            ImGui.Text(World.ActiveMap.camera.Front.ToString());
-        }
+
 
         
         if (World.ActiveMap is not null)
@@ -165,6 +164,11 @@ public class Engine
             {
                 entity.OnRender(deltaTime); 
                 ImGui.Text($"{entity} ({entity.Name})");
+            }
+            
+            if (World.ActiveMap.camera != null)
+            {
+                ImGui.Text(World.ActiveMap.camera.Front.ToString());
             }
         }
 

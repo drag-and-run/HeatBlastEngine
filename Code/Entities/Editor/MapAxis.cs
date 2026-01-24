@@ -32,9 +32,9 @@ public class MapAxis : RenderEntity
             Material.Shader.SetUniform("uView", view);
             Material.Shader.SetUniform("uProjection", projection);
             
-            Renderer.GL.PolygonMode(GLEnum.FrontAndBack,GLEnum.Line);
             Renderer.GL.DrawArrays(PrimitiveType.Lines, 0,(uint)mesh.Indices.Length);
-            Renderer.GL.PolygonMode(GLEnum.FrontAndBack,GLEnum.Fill);
         }
+        
+        Transform.Rotation = Quaternion.Identity;
     }
 }

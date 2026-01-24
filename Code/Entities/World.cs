@@ -28,8 +28,8 @@ public class World
        
 
         //var mdl1 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        //var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        //mdl2.Transform.Position = new Vector3(2, 0, 0);
+        var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        mdl2.Transform.Position = new Vector3(0, 1, 2);
         var axis = new MapAxis(Material.LoadFromFile("textures/editor/axis.matfile"),new Model("models/editor/axis.obj"));
     }
     

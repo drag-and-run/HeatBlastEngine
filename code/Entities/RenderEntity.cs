@@ -48,6 +48,8 @@ public class RenderEntity : Entity, IDisposable
             Renderer.GL.DrawArrays(PrimitiveType.Triangles, 0,(uint)mesh.Indices.Length);
 
         }
+
+        
     }
 
     public virtual void Dispose()
