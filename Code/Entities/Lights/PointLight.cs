@@ -7,11 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HeatBlastEngine.code.Entities;
+using Steamworks.ServerList;
 
 namespace HeatBlastEngine.code.Core.Entities.Lights
 {
-    public class PointLight : Entity
-    {
- 
-    }
+    public class PointLight(string name = "Light") : Entity(name);
 }

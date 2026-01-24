@@ -6,13 +6,16 @@ using Silk.NET.OpenGL;
 using Silk.NET.Vulkan;
 using Silk.NET.Windowing;
 using System.Numerics;
+using HeatBlastEngine.code.Entities;
 
 
 public class SkyEntity : RenderEntity
 {
-    public SkyEntity(Material _material, Model _model) : base(_material, _model)
+    public static SkyEntity? Instance;
+    
+    public SkyEntity(Material _material, Model _model, string name = "defaultSky") : base(_material, _model, name)
     {
-        
+        Instance = this;
     }
 
     public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
@@ -36,5 +39,13 @@ public class SkyEntity : RenderEntity
             Renderer.OpenGl.DepthFunc(GLEnum.Less);
         }
         
+    }
+    
+    public override void Dispose()
+    {
+        Material.Texture.Dispose();
+        Material.Shader.Dispose();
+        Model.Dispose();
+        Instance = null;
     }
 }

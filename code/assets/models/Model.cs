@@ -16,6 +16,7 @@ public class Model : IDisposable
         _assimp = assimp;
         _gl = Renderer.OpenGl;
         LoadModel(filepath);
+        
     }
 
     private unsafe void LoadModel(string filepath)
@@ -116,7 +117,7 @@ public class Model : IDisposable
         // diffuse: texture_diffuseN
 
         // return a mesh object created from the extracted mesh data
-        var result = new BaseMesh(_gl, BuildVertices(vertices), BuildIndices(indices), null);
+        var result = new BaseMesh(BuildVertices(vertices), BuildIndices(indices), null);
         return result;
     }
 
@@ -154,6 +155,7 @@ public class Model : IDisposable
         foreach (var mesh in Meshes)
         {
             mesh.Dispose();
+            
         }
     }
 }

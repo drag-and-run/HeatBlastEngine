@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using HeatBlastEngine.code.Core;
 
 namespace HeatBlastEngine.code.assets.models
 {
@@ -25,16 +26,16 @@ namespace HeatBlastEngine.code.assets.models
 
     public class BaseMesh : IDisposable
     {
-        public GL _gl { get; }
+
         public VertexArrayObject<float, uint> VAO { get; set; }
         public BufferObject<float> VBO { get; set; }
         public BufferObject<uint> EBO { get; set; }
         public IReadOnlyList<Texture> Textures { get; private set; }
         public float[] Vertices { get; private set; }
         public uint[] Indices { get; private set; }
-        public BaseMesh(GL gl, float[] verticies, uint[] indicies, List<Texture> textures)
+        public BaseMesh( float[] verticies, uint[] indicies, List<Texture> textures)
         {
-            _gl = gl;   
+ 
             Vertices = verticies;
             Indices = indicies;
             Textures = textures;
@@ -43,9 +44,11 @@ namespace HeatBlastEngine.code.assets.models
 
         public unsafe void SetupMesh()
         {
-            EBO = new BufferObject<uint>(_gl, BufferTargetARB.ElementArrayBuffer,Indices );
-            VBO = new BufferObject<float>(_gl, BufferTargetARB.ArrayBuffer, Vertices);    
-            VAO = new VertexArrayObject<float, uint>(_gl, VBO, EBO);
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            
+            EBO = new BufferObject<uint>(Renderer.OpenGl, BufferTargetARB.ElementArrayBuffer,Indices );
+            VBO = new BufferObject<float>(Renderer.OpenGl, BufferTargetARB.ArrayBuffer, Vertices);    
+            VAO = new VertexArrayObject<float, uint>(Renderer.OpenGl, VBO, EBO);
             // Match attribute locations with the vertex shader:
             // layout(location = 0) aPos (vec3)
             // layout(location = 1) aTexCoord (vec2)
@@ -56,8 +59,7 @@ namespace HeatBlastEngine.code.assets.models
             VAO.VertexAttributePointer(2, 3, VertexAttribPointerType.Float, 11, 6); // color
             VAO.VertexAttributePointer(3, 3, VertexAttribPointerType.Float, 11, 3); // normal (unused by shader)
             
-            // Unbind VAO to prevent state pollution when setting up other meshes
-            _gl.BindVertexArray(0);
+            
         }
 
         public void Bind()
@@ -67,6 +69,7 @@ namespace HeatBlastEngine.code.assets.models
 
         public void Dispose()
         {
+            Console.WriteLine("Mesh disposed");
             Textures = null;
             VAO.Dispose();
             VBO.Dispose();

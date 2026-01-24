@@ -15,7 +15,7 @@ public class RenderEntity : Entity, IDisposable
     public Material Material;
     public Model Model;
 
-    public RenderEntity(Material _material, Model _model)
+    public RenderEntity(Material _material, Model _model,string name ="defaulRenderEntity") : base(name)
     {
         Material = _material;
         Model = _model;
@@ -39,23 +39,18 @@ public class RenderEntity : Entity, IDisposable
         {
 
             mesh.Bind();
-
-            
             Material.Texture.Bind();
 
             Material.Shader.SetUniform("uModel", model);
             Material.Shader.SetUniform("uView", view);
             Material.Shader.SetUniform("uProjection", projection);
-
-
-            // We have an EBO (indices). Draw using DrawElements with the index count.
             
-            Renderer.OpenGl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
+            Renderer.OpenGl.DrawArrays(PrimitiveType.Triangles, 0,(uint)mesh.Indices.Length);
 
         }
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         Material.Texture.Dispose();
         Material.Shader.Dispose();

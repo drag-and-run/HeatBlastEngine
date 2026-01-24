@@ -1,4 +1,4 @@
-
+#define IMGUI
 
 using System.Drawing;
 using System.Numerics;
@@ -145,21 +145,34 @@ public class Engine
         Renderer.OpenGl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         Renderer.OpenGl.ClearDepth(1f);
 
+        #if IMGUI
         _controller.Update((float)deltaTime);
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
-        
+        ImGui.SliderFloat3("POS",ref newentpos,0,4);
+
+
         
         if (World.ActiveMap is not null)
         {
             foreach (Entity entity in World.ActiveMap.Entities)
             {
                 entity.OnRender(deltaTime); 
-                ImGui.Text(entity.ToString());
+                ImGui.Text($"{entity} ({entity.Name})");
             }
         }
 
-        ImGui.SliderFloat3("POS",ref newentpos,0,4);
+        if (World.ActiveMap is not null && SkyEntity.Instance is null)
+        {
+            if (ImGui.Button("ADD SKYBOX"))
+            {
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("PRESSED");
+                var sky = new SkyEntity(Material.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
+            }
+        }
+
+        #endif
         
 
         if (World.ActiveMap is not null)
@@ -173,9 +186,12 @@ public class Engine
         
         Renderer._window.FramesPerSecond = ENGINE_FPS;
         
+        #if IMGUI
         ImGui.StyleColorsLight();
         ImGui.End();
         _controller.Render();
+        #endif
+
     }
     static bool isCursorVisible = false;
     static bool drawWireframe = false;
@@ -211,6 +227,7 @@ public class Engine
         switch (keyarg)
         {
             case Key.X:
+                if (World.ActiveMap is null) return;
                 World.ActiveMap.UnloadMap();
                 break;
             case Key.R:
@@ -219,8 +236,9 @@ public class Engine
                 break;
             case Key.G:
                 if (World.ActiveMap is null) return;
-                World.ActiveMap.AddEntity(new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),
-                    new Model("models/test.obj")),new Transform(newentpos));
+                var ent = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),
+                    new Model("models/test.obj"), "CustomEntity");
+                    ent.Transform.Position = newentpos;
                 break;
         }
     }

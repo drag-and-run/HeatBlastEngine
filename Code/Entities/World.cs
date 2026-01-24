@@ -24,15 +24,13 @@ public class World
         
         camera = new Camera();
         PointLight = new PointLight();
-        var sky = new SkyEntity(Material.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
+       
 
-        new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        var mdl1 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
+        mdl2.Transform.Position = new Vector3(0, 5, 0);
     }
-
-    public void AddEntity(Entity entity, Transform transform)
-    {
-        entity.Transform = transform;
-    }
+    
 
     public void UnloadMap()
     {

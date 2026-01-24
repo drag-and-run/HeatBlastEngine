@@ -14,6 +14,7 @@ namespace HeatBlastEngine.code.Core
 {
     public class Camera : Entity, IMouseMove
     {
+        public Camera(string name = "Camera") : base(name) {}
 
         public float Yaw = 270f;
         public float Pitch = 0f;

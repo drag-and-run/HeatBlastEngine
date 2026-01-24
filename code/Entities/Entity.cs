@@ -10,8 +10,9 @@ public class Entity
     public Guid uid =  Guid.NewGuid();
     public Transform Transform { get; set; }
     
-    public Entity() 
+    public Entity(string name = "Default") 
     {
+        Name = name;
         Transform = new Transform();
         World.ActiveMap.Entities.Add(this);
         Console.ForegroundColor = ConsoleColor.Green;
