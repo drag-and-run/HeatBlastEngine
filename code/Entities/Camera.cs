@@ -20,7 +20,7 @@ namespace HeatBlastEngine.code.Core
         public float Fov = 60f;
         
         private static Vector2 LastMousePosition;
-        private static float lookSensitivity = 0.1f;
+        public static float lookSensitivity = 0.1f;
 
         public Vector3 Direction = Vector3.Zero;
 

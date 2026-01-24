@@ -23,13 +23,15 @@ public class World
         Console.WriteLine($"Loading {ActiveMap.GetType().Name}");
         
         camera = new Camera();
-        camera.Transform.Position = new Vector3(0, 1, 2);
+        PointLight = new PointLight();
+        var sky = new SkyEntity(Material.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
 
         new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        
-        new SkyEntity(Material.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
-        PointLight = new PointLight();
-        PointLight.Transform.Position = new Vector3(0, 5, 0);
+    }
+
+    public void AddEntity(Entity entity, Transform transform)
+    {
+        entity.Transform = transform;
     }
 
     public void UnloadMap()

@@ -69,7 +69,6 @@ public class BaseTexture : IDisposable
 
     public void Bind(TextureUnit textureSlot = TextureUnit.Texture0)
     {
-        //When we bind a texture we can choose which textureslot we can bind it to.
         _gl.ActiveTexture(textureSlot);
         switch (Type)
         {

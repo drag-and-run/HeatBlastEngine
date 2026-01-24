@@ -15,14 +15,10 @@ public class VertexArrayObject<TVertexType, TIndexType> : IDisposable
         Bind();
         vbo.Bind();
         ebo.Bind();
-        // Do NOT unbind here—attribute pointers will be set immediately after
     }
 
     public unsafe void VertexAttributePointer(uint index, int count, VertexAttribPointerType type, uint vertexSize, int offSet)
     {
-        //Setting up a vertex attribute pointer
-        // Ensure this VAO is bound (it should be from constructor, but be defensive)
-        Bind();
         _gl.VertexAttribPointer(index, count, type, false, vertexSize * (uint)sizeof(TVertexType), (void*)(offSet * sizeof(TVertexType)));
         _gl.EnableVertexAttribArray(index);
     }

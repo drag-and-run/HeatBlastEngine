@@ -3,6 +3,7 @@
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core.Input;
 using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.Entities.Interfaces;
@@ -126,8 +127,12 @@ public class Engine
     {
         if (World.ActiveMap is not null)
         {
-            foreach (Entity entity in World.ActiveMap.Entities) 
-                entity.OnUpdate(deltaTime); 
+            foreach (Entity entity in World.ActiveMap.Entities)
+            {
+                entity.OnUpdate(deltaTime);
+                entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
+            }
+                
         }
     }
 
@@ -154,7 +159,7 @@ public class Engine
             }
         }
 
-            
+        ImGui.SliderFloat3("POS",ref newentpos,0,4);
         
 
         if (World.ActiveMap is not null)
@@ -174,6 +179,8 @@ public class Engine
     }
     static bool isCursorVisible = false;
     static bool drawWireframe = false;
+
+    private static Vector3 newentpos;
     private static void KeyDown(IKeyboard keyboard, Key keyarg, int keyCode) 
     {
         if (keyarg == Key.Escape) Renderer._window.Close();
@@ -184,11 +191,13 @@ public class Engine
             {
                 InputManager.primaryMouse.Cursor.CursorMode = CursorMode.Raw;
                 isCursorVisible = false;
+                Camera.lookSensitivity = 0.1f;
             }
             else
             {
                 InputManager.primaryMouse.Cursor.CursorMode = CursorMode.Normal;
                 isCursorVisible = true;
+                Camera.lookSensitivity = 0;
             }
         }
 
@@ -207,6 +216,11 @@ public class Engine
             case Key.R:
                 World.ActiveMap = new World();
                 World.ActiveMap.LoadMap();
+                break;
+            case Key.G:
+                if (World.ActiveMap is null) return;
+                World.ActiveMap.AddEntity(new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),
+                    new Model("models/test.obj")),new Transform(newentpos));
                 break;
         }
     }
