@@ -24,13 +24,18 @@ public class World
         Console.WriteLine($"Loading {ActiveMap.GetType().Name}");
         
         camera = new Camera();
+        camera.Transform.Position = new Vector3(0, 0, 4);
         PointLight = new PointLight();
-       
 
-        //var mdl1 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        var mdl2 = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),new Model("models/test.obj"));
-        mdl2.Transform.Position = new Vector3(0, 1, 2);
-        var axis = new MapAxis(Material.LoadFromFile("textures/editor/axis.matfile"),new Model("models/editor/axis.obj"));
+        
+        var error1 = new RenderEntity(BaseMaterial.LoadFromFile("textures/plane.matfile"),null, "Texture only");
+        var error2 = new RenderEntity(null,new Model("models/test.obj"), "Model only");
+        error2.Transform.Position = new Vector3(4, 0, 0);
+        var error3 = new RenderEntity(null,null, "NULL model");
+        error3.Transform.Position = new Vector3(-4, 0, 0);
+
+        
+        var axis = new MapAxis(BaseMaterial.LoadFromFile("textures/editor/axis.matfile"),new Model("models/editor/axis.obj"));
     }
     
 

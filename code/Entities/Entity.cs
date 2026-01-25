@@ -9,6 +9,8 @@ public class Entity
     public string Name {get; set;}
     public Guid uid =  Guid.NewGuid();
     public Transform Transform { get; set; }
+
+    public float test = 0;
     
     public Entity(string name = "Default") 
     {

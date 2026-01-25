@@ -10,11 +10,11 @@ namespace HeatBlastEngine.Code.Editor;
 
 public class MapAxis : RenderEntity
 {
-    public MapAxis(Material _material, Model _model, string name = "defaulAxisEntity") : base(_material, _model, name)
+    public MapAxis(BaseMaterial baseMaterial, Model _model, string name = "defaulAxisEntity") : base(baseMaterial, _model, name)
     {
     }
     
-    public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
+    /*public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
     {
         var size = _window.FramebufferSize;
         var model = Matrix4x4.CreateFromQuaternion(Transform.Rotation) * Matrix4x4.CreateTranslation(Transform.Position);
@@ -36,5 +36,5 @@ public class MapAxis : RenderEntity
         }
         
         Transform.Rotation = Quaternion.Identity;
-    }
+    }*/
 }

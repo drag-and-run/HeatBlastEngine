@@ -12,51 +12,28 @@ using HeatBlastEngine.code.maps;
 public class RenderEntity : Entity, IDisposable
 {
 
-    public Material Material;
+    public BaseMaterial BaseMaterial;
     public Model Model;
 
-    public RenderEntity(Material _material, Model _model,string name ="defaulRenderEntity") : base(name)
+    public RenderEntity(BaseMaterial baseMaterial, Model _model,string name ="defaulRenderEntity") : base(name)
     {
-        Material = _material;
+        BaseMaterial = baseMaterial;
         Model = _model;
     }
 
     public override void OnRender(double deltaTime)
     {
-        Render(World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight);
+        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, false);
     }
 
-    public virtual unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
-    {
-        var size = _window.FramebufferSize;
-        var model = Matrix4x4.CreateFromQuaternion(Transform.Rotation) * Matrix4x4.CreateTranslation(Transform.Position);
-        var view = Matrix4x4.CreateLookAt(camera.Transform.Position, camera.Transform.Position + camera.Front, Vector3.UnitY);
-        var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
-        Material.Shader.Use();
-        Material.Shader.SetUniform("ulightPos", pointLight.Transform.Position);
-        Material.Shader.SetUniform("uViewPos", camera.Transform.Position);
-        foreach (var mesh in Model.Meshes)
-        {
 
-            mesh.Bind();
-            Material.Texture.Bind();
-
-            Material.Shader.SetUniform("uModel", model);
-            Material.Shader.SetUniform("uView", view);
-            Material.Shader.SetUniform("uProjection", projection);
-            
-            Renderer.GL.DrawArrays(PrimitiveType.Triangles, 0,(uint)mesh.Indices.Length);
-
-        }
-
-        
-    }
 
     public virtual void Dispose()
     {
-        Material.Texture.Dispose();
-        Material.Shader.Dispose();
+        BaseMaterial.Texture.Dispose();
+        BaseMaterial.Shader.Dispose();
         Model.Dispose();
     }
 
 }
+

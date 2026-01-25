@@ -154,7 +154,7 @@ public class Engine
         _controller.Update((float)deltaTime);
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
-
+        ImGui.Text(Time.Elapsed.ToString());
 
 
         
@@ -164,6 +164,9 @@ public class Engine
             {
                 entity.OnRender(deltaTime); 
                 ImGui.Text($"{entity} ({entity.Name})");
+                var transform = entity.Transform.Position;
+                ImGui.SliderFloat3(entity.Name, ref transform, 0f, 10f);
+                entity.Transform.Position = transform;
             }
             
             if (World.ActiveMap.camera != null)
@@ -178,7 +181,7 @@ public class Engine
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("PRESSED");
-                var sky = new SkyEntity(Material.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
+                var sky = new SkyEntity(BaseMaterial.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
             }
         }
 
@@ -208,7 +211,7 @@ public class Engine
     static bool isCursorVisible = false;
     static bool drawWireframe = false;
 
-    private static Vector3 newentpos;
+
     private static void KeyDown(IKeyboard keyboard, Key keyarg, int keyCode) 
     {
         if (keyarg == Key.Escape) Renderer._window.Close();
@@ -248,7 +251,7 @@ public class Engine
                 break;
             case Key.G:
                 if (World.ActiveMap is null) return;
-                var ent = new RenderEntity(Material.LoadFromFile("textures/plane.matfile"),
+                var ent = new RenderEntity(BaseMaterial.LoadFromFile("textures/plane.matfile"),
                     new Model("models/monkey.obj"), "CustomEntity");
                 ent.Transform.Position = World.ActiveMap.camera.Transform.Position + World.ActiveMap.camera.Front * 5f;
                 break;
