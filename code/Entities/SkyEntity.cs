@@ -22,7 +22,7 @@ public class SkyEntity : RenderEntity
 
     public override void OnRender(double deltaTime)
     {
-        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, true);
+        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, RenderType.Sky);
     }
 
     public override void Dispose()

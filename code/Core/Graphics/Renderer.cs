@@ -1,6 +1,7 @@
 using System.Numerics;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core.Entities.Lights;
+using HeatBlastEngine.code.Entities;
 using Silk.NET.Assimp;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -9,13 +10,21 @@ using PrimitiveType = Silk.NET.OpenGL.PrimitiveType;
 
 namespace HeatBlastEngine.code.Core;
 
+public enum RenderType
+{
+    Default,
+    Sky,
+    Gizmo
+}
+
 public static class Renderer
 {
     public static GL GL;
     public static IWindow _window;
+
+
     
-    
-    public static unsafe void Render(RenderEntity entity,Camera camera, IWindow _window, PointLight pointLight, bool isSky)
+    public static unsafe void Render(RenderEntity entity,Camera camera, IWindow _window, PointLight pointLight, RenderType type)
     {
         if (entity.BaseMaterial is null && entity.Model is not null)
         {
@@ -53,21 +62,30 @@ public static class Renderer
             entity.BaseMaterial.Texture.Bind();
             
             //TODO: implement material flags instead of entities
-            if (isSky)
+            switch (type)
             {
-                Renderer.GL.DepthFunc(GLEnum.Lequal);
-                Renderer.GL.DrawArrays(PrimitiveType.Triangles,0, (uint)mesh.Indices.Length);
-                Renderer.GL.DepthFunc(GLEnum.Less);
-            }
-            else
-            {
-                entity.BaseMaterial.Shader.SetUniform("uModel", model);
+                case RenderType.Default:
+                    entity.BaseMaterial.Shader.SetUniform("uModel", model);
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, (uint)mesh.Indices.Length);
+                    break;
 
-            
-                Renderer.GL.DrawArrays(PrimitiveType.Triangles, 0,(uint)mesh.Indices.Length);
+                case RenderType.Sky:
+                    GL.DepthFunc(GLEnum.Lequal);
+                    GL.DrawArrays(PrimitiveType.Triangles, 0, (uint)mesh.Indices.Length);
+                    GL.DepthFunc(GLEnum.Less);
+                    break;
+                
+                case RenderType.Gizmo:
+                    entity.BaseMaterial.Shader.SetUniform("uModel", model);
+                    GL.DrawArrays(PrimitiveType.Lines, 0,(uint)mesh.Indices.Length);
+                    entity.Transform.Rotation = Quaternion.Identity;
+                    break;
             }
         }
         
         
     }
 }
+
+
+        

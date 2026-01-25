@@ -2,6 +2,7 @@ using System.Numerics;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Core.Entities.Lights;
+using HeatBlastEngine.code.maps;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -14,27 +15,10 @@ public class MapAxis : RenderEntity
     {
     }
     
-    /*public override unsafe void Render(HeatBlastEngine.code.Core.Camera camera, IWindow _window, PointLight pointLight)
+    public override void OnRender(double deltaTime)
     {
-        var size = _window.FramebufferSize;
-        var model = Matrix4x4.CreateFromQuaternion(Transform.Rotation) * Matrix4x4.CreateTranslation(Transform.Position);
-        var view = Matrix4x4.CreateLookAt(camera.Transform.Position, camera.Transform.Position + camera.Front, Vector3.UnitY);
-        var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
-        Material.Shader.Use();
-        Material.Shader.SetUniform("uViewPos", camera.Transform.Position);
-        foreach (var mesh in Model.Meshes)
-        {
+        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, RenderType.Gizmo);
+    }
+    
 
-            mesh.Bind();
-            Material.Texture.Bind();
-
-            Material.Shader.SetUniform("uModel", model);
-            Material.Shader.SetUniform("uView", view);
-            Material.Shader.SetUniform("uProjection", projection);
-            
-            Renderer.GL.DrawArrays(PrimitiveType.Lines, 0,(uint)mesh.Indices.Length);
-        }
-        
-        Transform.Rotation = Quaternion.Identity;
-    }*/
 }

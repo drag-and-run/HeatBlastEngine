@@ -23,7 +23,7 @@ public class RenderEntity : Entity, IDisposable
 
     public override void OnRender(double deltaTime)
     {
-        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, false);
+        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, RenderType.Default);
     }
 
 
