@@ -1,10 +1,12 @@
-﻿
+﻿using HeatBlastEngine.code.logic.components;
+
 using System.Numerics;
 
-public class Transform
+
+public class Transform : Component
 {
 
-
+    [ShowInEditor]
     public Vector3 Position {  get; set; } = new Vector3(0, 0, 0);
 
     public float Scale { get; set; } = 1f;

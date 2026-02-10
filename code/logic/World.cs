@@ -2,6 +2,7 @@ using System.Numerics;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Entities;
+using HeatBlastEngine.code.logic.components;
 
 
 namespace HeatBlastEngine.code.maps;
@@ -15,6 +16,8 @@ public class World
     
     public Camera camera { get; private set; }
     
+    public static Entity sky { get; set; }
+    
     public void LoadMap()
     {
         Console.ForegroundColor = ConsoleColor.Blue;
@@ -22,18 +25,16 @@ public class World
         
         camera = (Camera)CreateEntity(new Camera(), new Vector3(0,0,4));
         
-
-        CreateEntity(new RenderEntity(BaseMaterial.LoadFromFile("textures/plane.matfile"), null, "Texture only"));
-        CreateEntity(new RenderEntity(null,new Model("models/test.obj"), "Model only"));
-        CreateEntity(new RenderEntity(null,null, "NULL model"), new Vector3(0,1,0));
         
 
+        var ent = CreateEntity(new Entity());
+        ent.AddComponent(new ModelRender(null,null));
     }
 
 
     public Entity CreateEntity(Entity ent, Vector3 position = default)
     {
-        ent.Transform.Position = position;
+        ent.GetComponent<Transform>().Position = position;
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"created {ent}");
         Entities.Add(ent);

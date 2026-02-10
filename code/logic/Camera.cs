@@ -33,19 +33,19 @@ namespace HeatBlastEngine.code.Core
             var speed = 5f * (float)deltaTime;
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.W))
             {
-                Transform.Position += speed * Front;
+                GetComponent<Transform>().Position += speed * Front;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.S))
             {
-                Transform.Position -= speed * Front;
+                GetComponent<Transform>().Position -= speed * Front;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.D))
             {
-                Transform.Position += Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
+                GetComponent<Transform>().Position += Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }
             if (InputManager.primaryKeyboard.IsKeyPressed(Key.A))
             {
-                Transform.Position -= Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
+                GetComponent<Transform>().Position -= Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }
         }
 

@@ -8,6 +8,7 @@ using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core.Input;
 using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.Entities.Interfaces;
+using HeatBlastEngine.code.logic.components;
 using HeatBlastEngine.code.maps;
 using ImGuiNET;
 using Silk.NET.Input;
@@ -99,8 +100,7 @@ public class Engine
         World.ActiveMap = new World();
         World.ActiveMap.LoadMap();
 
-        //var physics = new PhysicsWorld();
-        //physics.Initialize();
+
         
         //Imgui
         _controller = new ImGuiController(Renderer.GL, Renderer._window, input);
@@ -123,7 +123,7 @@ public class Engine
         {
             foreach (Entity entity in World.ActiveMap.Entities)
             {
-                entity.OnUpdate(deltaTime);
+                entity?.OnUpdate(deltaTime);
             }
         }
     }
@@ -153,16 +153,22 @@ public class Engine
             {
                 
                 entity.OnRender(deltaTime);
-               
+                
+                var mdl = entity.GetComponent<ModelRender>();
+                if (mdl is not null)
+                {
+                    mdl.Render(deltaTime);
+                }
 
-                foreach (var property in  typeof(Entity).GetProperties())
+
+                foreach (var property in  typeof(Transform).GetProperties())
                 {
                     var feature = property.GetCustomAttribute<ShowInEditorAttribute>();
                     if (feature != null)
                     {
-                        var transformPosition = entity.Transform.Position;
+                        var transformPosition = entity.GetComponent<Transform>().Position;
                         ImGui.SliderFloat3(entity.id.ToString(),ref transformPosition, 0,5f);
-                        entity.Transform.Position = transformPosition;
+                        entity.GetComponent<Transform>().Position = transformPosition;
                     }
                 }
  
@@ -170,13 +176,14 @@ public class Engine
             
         }
 
-        if (World.ActiveMap is not null && SkyEntity.Instance is null)
+        if (World.ActiveMap is not null)
         {
             if (ImGui.Button("ADD SKYBOX"))
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("PRESSED");
-                World.ActiveMap.CreateEntity(new SkyEntity(BaseMaterial.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj")));
+                var sky = World.ActiveMap.CreateEntity(new Entity());
+                sky.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/skybox.matfile", RenderFlags.Skybox), new Model("models/editor/cube.obj")));
             }
         }
 
@@ -258,9 +265,10 @@ public class Engine
                 break;
             case Key.G:
                 if (World.ActiveMap is null) return;
-                var ent = new RenderEntity(BaseMaterial.LoadFromFile("textures/plane.matfile"),
-                    new Model("models/monkey.obj"), "CustomEntity");
-                ent.Transform.Position = World.ActiveMap.camera.Transform.Position + World.ActiveMap.camera.Front * 5f;
+                var ent = World.ActiveMap.CreateEntity(new Entity());
+                ent.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/plane.matfile"),
+                    new Model("models/monkey.obj")));
+                ent.GetComponent<Transform>().Position = World.ActiveMap.camera.GetComponent<Transform>().Position + World.ActiveMap.camera.Front * 5f;
                 break;
         }
     }

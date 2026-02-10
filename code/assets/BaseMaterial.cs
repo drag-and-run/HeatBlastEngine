@@ -16,13 +16,14 @@ namespace HeatBlastEngine.code.assets
         public BaseShader Shader { get; set; }
         public BaseTexture Texture { get; set; }
 
+        public RenderFlags flags { get; set; }
 
-
-        public BaseMaterial(BaseShader _shader, BaseTexture _texture, string _name = "default_material")
+        public BaseMaterial(BaseShader _shader, BaseTexture _texture, string _name = "default_material", RenderFlags _flags = RenderFlags.Default)
         {
             Texture = _texture;
             Shader = _shader;
             Name = _name;
+            flags = _flags;
         }
         [JsonConstructor]
         public BaseMaterial()
@@ -30,7 +31,7 @@ namespace HeatBlastEngine.code.assets
 
         }
 
-        public static BaseMaterial LoadFromFile(string filepath)
+        public static BaseMaterial LoadFromFile(string filepath, RenderFlags flags = RenderFlags.Default)
         {
             string jsonString = File.ReadAllText(filepath);
             if (jsonString is null)
@@ -41,7 +42,7 @@ namespace HeatBlastEngine.code.assets
             BaseMaterial baseMaterial = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
             //TODO: Handle textureless materials
                 return new BaseMaterial(new BaseShader(baseMaterial.Shader.vertexShaderPath, baseMaterial.Shader.fragmentShaderPath),
-                    new BaseTexture(Renderer.GL, baseMaterial.Texture.Path, baseMaterial.Texture.Type), baseMaterial.Name);
+                    new BaseTexture(Renderer.GL, baseMaterial.Texture.Path, baseMaterial.Texture.Type), baseMaterial.Name, flags);
 
         }
 

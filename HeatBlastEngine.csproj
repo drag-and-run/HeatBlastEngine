@@ -45,7 +45,6 @@
 	  <Copy SourceFiles="@(HeatBlastShaderFiles)" DestinationFolder="$(TargetDir)\shaders\%(RecursiveDir)" />
 	  <Copy SourceFiles="@(HeatBlastTextureFiles)" DestinationFolder="$(TargetDir)\textures\%(RecursiveDir)" />
 	  <Copy SourceFiles="@(HeatBlastModelFiles)" DestinationFolder="$(TargetDir)\models\%(RecursiveDir)" />
-	  <Copy SourceFiles="@(SteamWorks)" DestinationFolder="$(TargetDir)" />
   </Target>
 
 	
