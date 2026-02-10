@@ -2,12 +2,12 @@
   "Name": "test_material",
   "Shader": {
     "vertexShaderPath": "shaders/vertshader.glsl",
-    "fragmentShaderPath": "shaders/frag_line.glsl"
+    "fragmentShaderPath": "shaders/frag_light_basic.glsl"
   },
   "Texture": {
     "Type": "Color",
     "Path": [
-      "textures/colorgrid.png"
+      "textures/dev/colorgrid.png"
     ]
   }
 }

@@ -1,8 +1,5 @@
 using System.Numerics;
 using HeatBlastEngine.code.assets;
-using HeatBlastEngine.code.Core.Entities.Lights;
-using HeatBlastEngine.code.Entities;
-using Silk.NET.Assimp;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
@@ -24,13 +21,13 @@ public static class Renderer
 
 
     
-    public static unsafe void Render(RenderEntity entity,Camera camera, IWindow _window, PointLight pointLight, RenderType type)
+    public static unsafe void Render(RenderEntity entity,Camera camera, IWindow _window, RenderType type)
     {
         if (entity.BaseMaterial is null && entity.Model is not null)
         {
 
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"No Material Set on {entity.Name}, using error material");
+            Console.Error.WriteLine($"No Material Set on {entity}, using error material");
             Console.ResetColor();
             entity.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/notexture.matfile");
 
@@ -38,7 +35,7 @@ public static class Renderer
         if (entity.Model is null)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine($"No Model Set on {entity.Name}");
+            Console.Error.WriteLine($"No Model Set on {entity}");
             Console.ResetColor();
             entity.Model = new Model("models/editor/error.obj");
             entity.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/error.matfile");
@@ -50,7 +47,6 @@ public static class Renderer
         var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
         
         entity.BaseMaterial.Shader.Use();
-        entity.BaseMaterial.Shader.SetUniform("ulightPos", pointLight.Transform.Position);
         entity.BaseMaterial.Shader.SetUniform("uViewPos", camera.Transform.Position);
         entity.BaseMaterial.Shader.SetUniform("uView", view);
         entity.BaseMaterial.Shader.SetUniform("uProjection", projection);

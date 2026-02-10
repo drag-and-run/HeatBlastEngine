@@ -7,7 +7,7 @@
   "Texture": {
     "Type": "Color",
     "Path": [
-      "textures/colorgrid.png"
+      "textures/dev/error.png"
     ]
   }
 }

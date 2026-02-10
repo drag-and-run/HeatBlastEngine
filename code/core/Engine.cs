@@ -2,10 +2,10 @@
 
 using System.Drawing;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using HeatBlastEngine.code.assets;
 using HeatBlastEngine.code.Core.Input;
-using HeatBlastEngine.Code.Editor;
 using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.Entities.Interfaces;
 using HeatBlastEngine.code.maps;
@@ -15,7 +15,6 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
-using Steamworks;
 namespace HeatBlastEngine.code.Core;
 
 
@@ -28,22 +27,7 @@ public class Engine
     
     public Engine(string[] args)
     {
-        #if STEAMWORKS
-        if (args.Contains("-steam"))
-        {
-            Console.WriteLine("INITIALIZING STEAM");
-            try 
-            {
-                SteamClient.Init( 4219140 );
-            }
-            catch ( System.Exception e )
-            {
-                Console.WriteLine(e.Message);
-            }
-            
-            SteamFriends.SetRichPresence("steam_display", "#dev_map");
-        }
-        #endif
+
         
         #region window
         WindowOptions options = WindowOptions.Default with
@@ -63,6 +47,9 @@ public class Engine
         Renderer._window.Closing += OnClose;
 
         Renderer._window.Run();
+
+       
+
         #endregion
     }
     
@@ -111,9 +98,13 @@ public class Engine
         //TODO: parser/editor for that
         World.ActiveMap = new World();
         World.ActiveMap.LoadMap();
+
+        //var physics = new PhysicsWorld();
+        //physics.Initialize();
         
         //Imgui
         _controller = new ImGuiController(Renderer.GL, Renderer._window, input);
+        
     }
 
     
@@ -133,9 +124,7 @@ public class Engine
             foreach (Entity entity in World.ActiveMap.Entities)
             {
                 entity.OnUpdate(deltaTime);
-                //entity.Transform.Rotation *= Quaternion.CreateFromAxisAngle(Vector3.UnitY,float.DegreesToRadians((float)deltaTime * 40f));
             }
-                
         }
     }
 
@@ -162,17 +151,23 @@ public class Engine
         {
             foreach (Entity entity in World.ActiveMap.Entities)
             {
-                entity.OnRender(deltaTime); 
-                ImGui.Text($"{entity} ({entity.Name})");
-                var transform = entity.Transform.Position;
-                ImGui.SliderFloat3(entity.Name, ref transform, 0f, 10f);
-                entity.Transform.Position = transform;
+                
+                entity.OnRender(deltaTime);
+               
+
+                foreach (var property in  typeof(Entity).GetProperties())
+                {
+                    var feature = property.GetCustomAttribute<ShowInEditorAttribute>();
+                    if (feature != null)
+                    {
+                        var transformPosition = entity.Transform.Position;
+                        ImGui.SliderFloat3(entity.id.ToString(),ref transformPosition, 0,5f);
+                        entity.Transform.Position = transformPosition;
+                    }
+                }
+ 
             }
             
-            if (World.ActiveMap.camera != null)
-            {
-                ImGui.Text(World.ActiveMap.camera.Front.ToString());
-            }
         }
 
         if (World.ActiveMap is not null && SkyEntity.Instance is null)
@@ -181,7 +176,7 @@ public class Engine
             {
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
                 Console.WriteLine("PRESSED");
-                var sky = new SkyEntity(BaseMaterial.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj"));
+                World.ActiveMap.CreateEntity(new SkyEntity(BaseMaterial.LoadFromFile("textures/skybox.matfile"), new Model("models/editor/cube.obj")));
             }
         }
 
@@ -190,7 +185,7 @@ public class Engine
 
         if (World.ActiveMap is not null)
         {
-            ImGui.Text(World.ActiveMap.ToString());
+            ImGui.Text("CURRENT MAP: " + World.ActiveMap.ToString());
         }
         else
         {
@@ -209,6 +204,7 @@ public class Engine
 
     }
     static bool isCursorVisible = false;
+    static bool isFullscreen = false;
     static bool drawWireframe = false;
 
 
@@ -239,6 +235,12 @@ public class Engine
             Renderer.GL.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
         }
 
+        if (keyarg == Key.F)
+        {
+            isFullscreen = !isFullscreen;
+            Renderer._window.WindowState = isFullscreen? WindowState.Fullscreen: WindowState.Normal;
+        }
+
         switch (keyarg)
         {
             case Key.X:
@@ -246,6 +248,11 @@ public class Engine
                 World.ActiveMap.UnloadMap();
                 break;
             case Key.R:
+                if (World.ActiveMap is not null)
+                {
+                    World.ActiveMap.UnloadMap();
+                }
+                
                 World.ActiveMap = new World();
                 World.ActiveMap.LoadMap();
                 break;

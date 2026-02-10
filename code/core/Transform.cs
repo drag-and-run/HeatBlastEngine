@@ -3,17 +3,7 @@ using System.Numerics;
 
 public class Transform
 {
-    public Transform() { }
-    public Transform(Vector3 position)
-    {
-        Position = position;
 
-    }
-    
-
-    public static readonly Transform Identity = new Transform(
-
-    );
 
     public Vector3 Position {  get; set; } = new Vector3(0, 0, 0);
 
@@ -24,8 +14,6 @@ public class Transform
     public Vector3 Forward => Vector3.UnitZ;
     public Vector3 Right => Vector3.UnitX;
     
-
-
     public Matrix4x4 ViewMatrix => Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateScale(Scale) * Matrix4x4.CreateTranslation(Position);
 }
 

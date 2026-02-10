@@ -25,6 +25,8 @@ namespace HeatBlastEngine.code.Core
 
         public Vector3 Direction = Vector3.Zero;
         public Vector3 Front = new Vector3(0, 0, 0);
+        
+        
 
         public override void OnUpdate(double deltaTime)
         {

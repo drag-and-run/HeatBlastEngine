@@ -1,9 +1,4 @@
 using HeatBlastEngine.code.assets;
-using HeatBlastEngine.code.Core.Entities.Lights;
-using Silk.NET.Maths;
-using Silk.NET.OpenGL;
-using Silk.NET.Windowing;
-using System.Numerics;
 using HeatBlastEngine.code.Core;
 using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.maps;
@@ -23,7 +18,7 @@ public class RenderEntity : Entity, IDisposable
 
     public override void OnRender(double deltaTime)
     {
-        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, World.ActiveMap.PointLight, RenderType.Default);
+        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, RenderType.Default);
     }
 
 
@@ -34,6 +29,5 @@ public class RenderEntity : Entity, IDisposable
         BaseMaterial.Shader.Dispose();
         Model.Dispose();
     }
-
 }
 
