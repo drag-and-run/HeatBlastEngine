@@ -1,10 +1,7 @@
-﻿
-using System.Numerics;
-using HeatBlastEngine.code.Entities.Interfaces;
-using HeatBlastEngine.code.Input;
+﻿using System.Numerics;
 using Silk.NET.Input;
 
-namespace HeatBlastEngine.code
+namespace HeatBlastEngine
 {
     public class Camera : Entity, IMouseMove
     {

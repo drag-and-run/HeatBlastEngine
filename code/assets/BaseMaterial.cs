@@ -1,15 +1,10 @@
-﻿using HeatBlastEngine.code;
-using Silk.NET.OpenGL;
-using System;
-using System.Collections.Generic;
+﻿using Silk.NET.OpenGL;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+using HeatBlastEngine;
 
-namespace HeatBlastEngine.code.assets
+namespace HeatBlastEngine
 {
     public class BaseMaterial
     {

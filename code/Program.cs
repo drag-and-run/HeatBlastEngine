@@ -1,6 +1,4 @@
-﻿using HeatBlastEngine.code;
-
-namespace HeatBlastEngine.code;
+﻿using HeatBlastEngine;
 
 public static class Program
 {

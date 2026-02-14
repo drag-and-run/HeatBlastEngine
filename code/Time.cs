@@ -1,7 +1,8 @@
-﻿
-
-public static class Time
+﻿namespace HeatBlastEngine
+{
+    public static class Time
     {
         public static float Elapsed { get; set; }
-}   
+    }
+}
 

@@ -1,10 +1,11 @@
 using Silk.NET.Input;
 
-namespace HeatBlastEngine.code.Input;
-
-public class InputManager
+namespace HeatBlastEngine
 {
-    public static IKeyboard primaryKeyboard { get;  set; }
-    public static IMouse primaryMouse { get; set; }
+    public class InputManager
+    {
+        public static IKeyboard primaryKeyboard { get;  set; }
+        public static IMouse primaryMouse { get; set; }
+    }
 }
 

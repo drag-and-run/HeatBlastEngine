@@ -1,40 +1,43 @@
-public partial class Entity
+namespace HeatBlastEngine
 {
-    private readonly HashSet<Component> _components = new();
-    public Guid Id = Guid.NewGuid();
-    public string Name;
-    public Entity? Parent;
-
-    public Entity(string name = "Default")
+    public class Entity
     {
-        Name = name;
-        //TODO: CUSTOM LOGGING
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"Entity created: {GetType()}");
+        private readonly HashSet<Component> _components = new();
+        public Guid Id = Guid.NewGuid();
+        public string Name;
+        public Entity? Parent;
 
-        AddComponent(new Transform());
-    }
+        public Entity(string name = "Default")
+        {
+            Name = name;
+            //TODO: CUSTOM LOGGING
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Entity created: {GetType()}");
 
-    public void AddComponent(Component component)
-    {
-        _components.Add(component);
-        component.entity = this;
-    }
+            AddComponent(new Transform());
+        }
 
-    public T GetComponent<T>() where T : Component
-    {
-        foreach (var component in _components)
-            if (component.GetType().Equals(typeof(T)))
-                return (T)component;
+        public void AddComponent(Component component)
+        {
+            _components.Add(component);
+            component.entity = this;
+        }
 
-        return null;
-    }
+        public T GetComponent<T>() where T : Component
+        {
+            foreach (var component in _components)
+                if (component.GetType().Equals(typeof(T)))
+                    return (T)component;
 
-    public virtual void OnUpdate(double deltaTime)
-    {
-    }
+            return null;
+        }
 
-    public virtual void OnRender(double deltaTime)
-    {
+        public virtual void OnUpdate(double deltaTime)
+        {
+        }
+
+        public virtual void OnRender(double deltaTime)
+        {
+        }
     }
 }

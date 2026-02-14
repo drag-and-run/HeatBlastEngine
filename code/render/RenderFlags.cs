@@ -1,7 +1,8 @@
-namespace HeatBlastEngine.code;
-
-public enum RenderFlags
+namespace HeatBlastEngine
 {
-    Default = 0,
-    Skybox = 2,
+    public enum RenderFlags
+    {
+        Default = 0,
+        Skybox = 2,
+    }
 }

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace Sandbox;
+namespace HeatBlastEngine;
 
 /// <summary>
 /// A convenience struct to easily measure time since an event last happened, based on <see cref="Time.Now"/>.<br/>

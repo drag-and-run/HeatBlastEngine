@@ -1,10 +1,8 @@
-﻿using Silk.NET.Assimp;
+﻿using System.Numerics;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using System.Numerics;
-using System.Reflection.Metadata;
 
-namespace HeatBlastEngine.code
+namespace HeatBlastEngine
 {
 
     public class BaseShader : IDisposable
