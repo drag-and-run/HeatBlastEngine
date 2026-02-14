@@ -4,7 +4,7 @@ using Silk.NET.OpenGL;
 using System.Numerics;
 using System.Reflection.Metadata;
 
-namespace HeatBlastEngine.code.Core
+namespace HeatBlastEngine.code
 {
 
     public class BaseShader : IDisposable
@@ -21,11 +21,11 @@ namespace HeatBlastEngine.code.Core
         {
             vertexShaderPath = vertexPath;
             fragmentShaderPath = fragmentPath;
-            _gl = Renderer.GL;
+            _gl = RenderManager.GL;
             
             uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);
             uint fragment = LoadShader(ShaderType.FragmentShader, fragmentPath);
-            _handle = Renderer.GL.CreateProgram();
+            _handle = RenderManager.GL.CreateProgram();
 
             _gl.AttachShader(_handle, vertex);
             _gl.AttachShader(_handle, fragment);

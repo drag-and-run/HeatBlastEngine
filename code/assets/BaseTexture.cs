@@ -66,6 +66,26 @@ public class BaseTexture : IDisposable
 
         SetParameters();
     }
+    
+
+
+    public unsafe uint Load(string[] filepath)
+    {
+        _texture = _gl.GenTexture();
+        Bind();
+        ImageResult result = ImageResult.FromMemory(System.IO.File.ReadAllBytes(filepath[0]), ColorComponents.RedGreenBlueAlpha);
+        fixed (byte* ptr = result.Data)
+        {
+            _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgb, (uint)result.Width,
+                (uint)result.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+        }
+        _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)TextureWrapMode.Repeat);
+        _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)TextureWrapMode.Repeat);
+        _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)TextureMinFilter.Nearest);
+        _gl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        
+        return _texture;
+    }
 
     public void Bind(TextureUnit textureSlot = TextureUnit.Texture0)
     {

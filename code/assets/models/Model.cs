@@ -1,8 +1,9 @@
-﻿using HeatBlastEngine.code.assets.models;
+﻿using System.Diagnostics;
+using HeatBlastEngine.code.assets.models;
 using Silk.NET.Assimp;
 using Silk.NET.OpenGL;
 using System.Numerics;
-using HeatBlastEngine.code.Core;
+using HeatBlastEngine.code;
 
 public class Model : IDisposable
 {
@@ -12,11 +13,13 @@ public class Model : IDisposable
     public List<BaseMesh> Meshes { get; protected set; } = new List<BaseMesh>();
     public Model( string filepath, bool gamma = false)
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
         var assimp = Silk.NET.Assimp.Assimp.GetApi();
         _assimp = assimp;
-        _gl = Renderer.GL;
+        _gl = RenderManager.GL;
         LoadModel(filepath);
-        
+        stopwatch.Stop();
+        Console.WriteLine($"Model loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
     }
 
     private unsafe void LoadModel(string filepath)

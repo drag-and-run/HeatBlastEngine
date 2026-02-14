@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using HeatBlastEngine.code.Core;
+using HeatBlastEngine.code;
 
 namespace HeatBlastEngine.code.assets.models
 {
@@ -46,9 +46,9 @@ namespace HeatBlastEngine.code.assets.models
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             
-            EBO = new BufferObject<uint>(Renderer.GL, BufferTargetARB.ElementArrayBuffer,Indices );
-            VBO = new BufferObject<float>(Renderer.GL, BufferTargetARB.ArrayBuffer, Vertices);    
-            VAO = new VertexArrayObject<float, uint>(Renderer.GL, VBO, EBO);
+            EBO = new BufferObject<uint>(RenderManager.GL, BufferTargetARB.ElementArrayBuffer,Indices );
+            VBO = new BufferObject<float>(RenderManager.GL, BufferTargetARB.ArrayBuffer, Vertices);    
+            VAO = new VertexArrayObject<float, uint>(RenderManager.GL, VBO, EBO);
             // Match attribute locations with the vertex shader:
             // layout(location = 0) aPos (vec3)
             // layout(location = 1) aTexCoord (vec2)
@@ -59,7 +59,7 @@ namespace HeatBlastEngine.code.assets.models
             VAO.VertexAttributePointer(2, 3, VertexAttribPointerType.Float, 11, 6); // color
             VAO.VertexAttributePointer(3, 3, VertexAttribPointerType.Float, 11, 3); // normal (unused by shader)
             
-            Renderer.GL.BindVertexArray(0);
+            RenderManager.GL.BindVertexArray(0);
         }
 
         public void Bind()

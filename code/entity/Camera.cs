@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using HeatBlastEngine.code.Core.Input;
-using HeatBlastEngine.code.Entities;
 using HeatBlastEngine.code.Entities.Interfaces;
-using HeatBlastEngine.code.maps;
+using HeatBlastEngine.code.Input;
 using Silk.NET.Input;
 
-namespace HeatBlastEngine.code.Core
+namespace HeatBlastEngine.code
 {
     public class Camera : Entity, IMouseMove
     {
@@ -25,8 +19,9 @@ namespace HeatBlastEngine.code.Core
 
         public Vector3 Direction = Vector3.Zero;
         public Vector3 Front = new Vector3(0, 0, 0);
-        
-        
+
+
+
 
         public override void OnUpdate(double deltaTime)
         {

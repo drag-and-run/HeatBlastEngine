@@ -1,7 +1,8 @@
-﻿using HeatBlastEngine.code.Core;
+﻿using HeatBlastEngine.code;
 
-public class Program
+namespace HeatBlastEngine.code;
+
+public static class Program
 {
-    private static Engine engine = null;
-    public static void Main(string[] args) => engine = new Engine(args);
+    public static void Main(string[] args) => Engine.Init(args);
 }

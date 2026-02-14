@@ -1,7 +1,8 @@
-﻿using HeatBlastEngine.code.Core;
+﻿using HeatBlastEngine.code;
 using Silk.NET.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -17,6 +18,8 @@ namespace HeatBlastEngine.code.assets
         public BaseTexture Texture { get; set; }
 
         public RenderFlags flags { get; set; }
+        
+        private static Dictionary<string, BaseMaterial> _materialCache = new Dictionary<string, BaseMaterial>();
 
         public BaseMaterial(BaseShader _shader, BaseTexture _texture, string _name = "default_material", RenderFlags _flags = RenderFlags.Default)
         {
@@ -33,6 +36,19 @@ namespace HeatBlastEngine.code.assets
 
         public static BaseMaterial LoadFromFile(string filepath, RenderFlags flags = RenderFlags.Default)
         {
+            // First, check if the material is already in the cache
+            if (_materialCache.ContainsKey(filepath))
+            {
+                Stopwatch cachedwatch = Stopwatch.StartNew();
+                Console.WriteLine($"[BaseMaterial] Returning cached material: {filepath}");
+                Console.ForegroundColor = ConsoleColor.Blue;
+                cachedwatch.Stop();
+                Console.WriteLine($"texture loaded in: {cachedwatch.ElapsedTicks} ticks ({cachedwatch.ElapsedMilliseconds} ms)");
+                Console.ResetColor();
+                return _materialCache[filepath];
+            }
+            
+            Stopwatch stopwatch = Stopwatch.StartNew();
             string jsonString = File.ReadAllText(filepath);
             if (jsonString is null)
             {
@@ -40,11 +56,29 @@ namespace HeatBlastEngine.code.assets
                 return null;
             }
             BaseMaterial baseMaterial = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
+
+
             //TODO: Handle textureless materials
-                return new BaseMaterial(new BaseShader(baseMaterial.Shader.vertexShaderPath, baseMaterial.Shader.fragmentShaderPath),
-                    new BaseTexture(Renderer.GL, baseMaterial.Texture.Path, baseMaterial.Texture.Type), baseMaterial.Name, flags);
+            Console.ForegroundColor = ConsoleColor.Blue;
+            stopwatch.Stop();
+            Console.WriteLine($"texture loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
+            Console.ResetColor();
+
+                BaseMaterial newMaterial = new BaseMaterial(
+                    new BaseShader(baseMaterial.Shader.vertexShaderPath, baseMaterial.Shader.fragmentShaderPath),
+                    new BaseTexture(RenderManager.GL, baseMaterial.Texture.Path, baseMaterial.Texture.Type),
+                    baseMaterial.Name,
+                    flags
+                );
+
+                // Cache the loaded material
+                _materialCache[filepath] = newMaterial;
+
+                return newMaterial;
 
         }
+        
+
 
         public void Use()
         {

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using HeatBlastEngine.code.assets;
-using HeatBlastEngine.code.Core;
-using HeatBlastEngine.code.maps;
+using HeatBlastEngine.code;
+
 
 namespace HeatBlastEngine.code.logic.components;
 
@@ -19,7 +19,7 @@ public class ModelRender : Component, IDisposable
     public void Render(double deltaTime)
     {
         if (World.ActiveMap is null) return;
-        Renderer.Render(this,World.ActiveMap.camera, Renderer._window, BaseMaterial);
+        RenderManager.Render(this,World.ActiveMap.PlayerCamera, RenderManager._window, BaseMaterial);
     }
 
 

@@ -1,6 +1,4 @@
-﻿using HeatBlastEngine.code.logic.components;
-
-using System.Numerics;
+﻿using System.Numerics;
 
 
 public class Transform : Component

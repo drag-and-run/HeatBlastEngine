@@ -1,4 +1,4 @@
-namespace HeatBlastEngine.code.Core;
+namespace HeatBlastEngine.code;
 
 public enum RenderFlags
 {

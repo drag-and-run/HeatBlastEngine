@@ -5,32 +5,28 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using HeatBlastEngine.code.assets;
-using HeatBlastEngine.code.Core.Input;
-using HeatBlastEngine.code.Entities;
-using HeatBlastEngine.code.Entities.Interfaces;
-using HeatBlastEngine.code.logic.components;
-using HeatBlastEngine.code.maps;
+using HeatBlastEngine.code.Input;
 using ImGuiNET;
+using Sandbox;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
-namespace HeatBlastEngine.code.Core;
+namespace HeatBlastEngine.code;
 
 
-public class Engine
+public static class Engine
 {
     public static string MAIN_TITLE = "HeastBlastEngine";
     public static int ENGINE_FPS = 140;
     private static ImGuiController _controller;
     
-    
-    public Engine(string[] args)
-    {
 
-        
-        #region window
+    public static Action OnLoadEvent;
+
+    public static void Init(string[] args)
+    {
         WindowOptions options = WindowOptions.Default with
         {
             Size = new Vector2D<int>(1920, 1080),
@@ -39,31 +35,28 @@ public class Engine
             VSync = false,
             Samples = 8
         };
-        Renderer._window = Window.Create(options);
+        RenderManager._window = Window.Create(options);
         
-        Renderer._window.Load += OnLoad;
-        Renderer._window.Render += OnRender;
-        Renderer._window.Update += OnUpdate;
-        Renderer._window.FramebufferResize += OnFramebufferResize;
-        Renderer._window.Closing += OnClose;
+        RenderManager._window.Load += OnLoad;
+        RenderManager._window.Render += OnRender;
+        RenderManager._window.Update += OnUpdate;
+        RenderManager._window.FramebufferResize += OnFramebufferResize;
+        RenderManager._window.Closing += OnClose;
 
-        Renderer._window.Run();
+        RenderManager._window.Run();
 
-       
-
-        #endregion
     }
     
     private static void OnFramebufferResize(Vector2D<int> newsize)
     {
-        Renderer.GL.Viewport(newsize);
+        RenderManager.GL.Viewport(newsize);
     }
 
     
     private static unsafe void OnLoad() 
     {
         #region input 
-        IInputContext input = Renderer._window.CreateInput();
+        IInputContext input = RenderManager._window.CreateInput();
         for (int i = 0; i < input.Keyboards.Count; i++)
         {
             input.Keyboards[i].KeyDown += KeyDown;
@@ -80,16 +73,16 @@ public class Engine
         #endregion
 
         #region opengl init flags
-        Renderer.GL = Renderer._window.CreateOpenGL();
-        Renderer.GL.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
+        RenderManager.GL = RenderManager._window.CreateOpenGL();
+        RenderManager.GL.ClearColor(Color.FromKnownColor(KnownColor.Desktop));
 
-        Renderer.GL.Enable(EnableCap.Blend);
-        Renderer.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-        Renderer.GL.Enable(GLEnum.CullFace);
-        Renderer.GL.Enable(EnableCap.Multisample);
-        Renderer.GL.Enable(GLEnum.DepthTest);
-        Renderer.GL.Enable(GLEnum.DebugOutput);
-        Renderer.GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
+        RenderManager.GL.Enable(EnableCap.Blend);
+        RenderManager.GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        RenderManager.GL.Enable(GLEnum.CullFace);
+        RenderManager.GL.Enable(EnableCap.Multisample);
+        RenderManager.GL.Enable(GLEnum.DepthTest);
+        RenderManager.GL.Enable(GLEnum.DebugOutput);
+        RenderManager.GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
         {
             string msg = Marshal.PtrToStringAnsi(message, length);
         }, IntPtr.Zero);
@@ -99,43 +92,60 @@ public class Engine
         //TODO: parser/editor for that
         World.ActiveMap = new World();
         World.ActiveMap.LoadMap();
-
+        
 
         
         //Imgui
-        _controller = new ImGuiController(Renderer.GL, Renderer._window, input);
-        
+        _controller = new ImGuiController(RenderManager.GL, RenderManager._window, input);
+        OnLoadEvent?.Invoke();
     }
+    
 
     
     private static void OnMouseMove(IMouse mouse, Vector2 position)
     {
         if (World.ActiveMap is not null)
         {
-            foreach (IMouseMove entity in World.ActiveMap.Entities.OfType<IMouseMove>())
-                entity?.OnMouseMove(mouse, position);
+            World.ActiveMap.PlayerCamera.OnMouseMove(mouse, position);
         }
     }
-
-    private static void OnUpdate(double deltaTime) 
+    static TimeSince sinceAdded = 0;
+    private static void OnUpdate(double deltaTime)
     {
+        Time.Elapsed = (float)RenderManager._window.Time;
         if (World.ActiveMap is not null)
         {
-            foreach (Entity entity in World.ActiveMap.Entities)
+            foreach (Entity entity in World.ActiveMap.EntityList)
             {
                 entity?.OnUpdate(deltaTime);
             }
         }
+        
+        if (World.ActiveMap is null) return;
+
+
+        
+        if (InputManager.primaryKeyboard.IsKeyPressed(Key.G) && sinceAdded > 0.1f)
+        {
+            var ent = World.ActiveMap.CreateEntity(new Entity());
+
+
+            
+            ent.AddComponent(new ModelRender(null, new Model("models/box.obj")));
+            ent.GetComponent<Transform>().Position = World.ActiveMap.PlayerCamera.GetComponent<Transform>().Position +
+                                                     World.ActiveMap.PlayerCamera.Front * 5f;
+
+            sinceAdded = 0;
+
+        }
+
     }
 
-    
+    public static int entcount = 0;
     private static unsafe void OnRender(double deltaTime) 
     {
-        Time.Elapsed = (float)Renderer._window.Time;
-        Time.FPS = 1 / deltaTime;
-
-        Renderer.GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        Renderer.GL.ClearDepth(1f);
+        RenderManager.GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        RenderManager.GL.ClearDepth(1f);
 
 
         
@@ -144,12 +154,13 @@ public class Engine
         ImGui.Begin("DEBUG");
         ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
         ImGui.Text(Time.Elapsed.ToString());
+        ImGui.Text(entcount.ToString());
 
 
         
         if (World.ActiveMap is not null)
         {
-            foreach (Entity entity in World.ActiveMap.Entities)
+            foreach (Entity entity in World.ActiveMap.EntityList)
             {
                 
                 entity.OnRender(deltaTime);
@@ -167,7 +178,7 @@ public class Engine
                     if (feature != null)
                     {
                         var transformPosition = entity.GetComponent<Transform>().Position;
-                        ImGui.SliderFloat3(entity.id.ToString(),ref transformPosition, 0,5f);
+                        ImGui.SliderFloat3(entity.Id.ToString(),ref transformPosition, 0,5f);
                         entity.GetComponent<Transform>().Position = transformPosition;
                     }
                 }
@@ -199,7 +210,7 @@ public class Engine
             ImGui.Text("NO MAP LOADED");
         }
         
-        Renderer._window.FramesPerSecond = ENGINE_FPS;
+        RenderManager._window.FramesPerSecond = ENGINE_FPS;
         
         #if IMGUI
         ImGui.StyleColorsLight();
@@ -217,7 +228,7 @@ public class Engine
 
     private static void KeyDown(IKeyboard keyboard, Key keyarg, int keyCode) 
     {
-        if (keyarg == Key.Escape) Renderer._window.Close();
+        if (keyarg == Key.Escape) RenderManager._window.Close();
 
         if (keyarg == Key.C)
         {
@@ -239,13 +250,13 @@ public class Engine
         {
             
             drawWireframe = !drawWireframe;
-            Renderer.GL.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+            RenderManager.GL.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
         }
 
         if (keyarg == Key.F)
         {
             isFullscreen = !isFullscreen;
-            Renderer._window.WindowState = isFullscreen? WindowState.Fullscreen: WindowState.Normal;
+            RenderManager._window.WindowState = isFullscreen? WindowState.Fullscreen: WindowState.Normal;
         }
 
         switch (keyarg)
@@ -263,14 +274,9 @@ public class Engine
                 World.ActiveMap = new World();
                 World.ActiveMap.LoadMap();
                 break;
-            case Key.G:
-                if (World.ActiveMap is null) return;
-                var ent = World.ActiveMap.CreateEntity(new Entity());
-                ent.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/plane.matfile"),
-                    new Model("models/monkey.obj")));
-                ent.GetComponent<Transform>().Position = World.ActiveMap.camera.GetComponent<Transform>().Position + World.ActiveMap.camera.Front * 5f;
-                break;
+
         }
+
     }
 
     private static void OnClose()

@@ -1,16 +1,16 @@
+using System.Diagnostics;
 using System.Numerics;
 using HeatBlastEngine.code.assets;
-using HeatBlastEngine.code.logic.components;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using PrimitiveType = Silk.NET.OpenGL.PrimitiveType;
 
-namespace HeatBlastEngine.code.Core;
+namespace HeatBlastEngine.code;
 
 
 
-public static class Renderer
+public static class RenderManager
 {
     public static GL GL;
     public static IWindow _window;
@@ -22,10 +22,14 @@ public static class Renderer
         if (rendmdl.BaseMaterial is null && rendmdl.Model is not null)
         {
 
+            
+   
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine($"No Material Set on {rendmdl}, using error material");
             Console.ResetColor();
             rendmdl.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/notexture.matfile");
+            
+
 
         }
         if (rendmdl.Model is null)
