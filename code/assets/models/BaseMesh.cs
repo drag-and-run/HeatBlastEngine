@@ -38,8 +38,7 @@ namespace HeatBlastEngine
 
         public unsafe void SetupMesh()
         {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            
+
             EBO = new BufferObject<uint>(RenderManager.GL, BufferTargetARB.ElementArrayBuffer,Indices );
             VBO = new BufferObject<float>(RenderManager.GL, BufferTargetARB.ArrayBuffer, Vertices);    
             VAO = new VertexArrayObject<float, uint>(RenderManager.GL, VBO, EBO);

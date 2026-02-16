@@ -10,9 +10,8 @@ namespace HeatBlastEngine
         public Entity(string name = "Default")
         {
             Name = name;
-            //TODO: CUSTOM LOGGING
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Entity created: {GetType()}");
+
+            DebugLog.Msg($"Entity created: {GetType()}");
 
             AddComponent(new Transform());
         }

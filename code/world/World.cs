@@ -10,8 +10,8 @@ namespace HeatBlastEngine
     
         public void LoadMap()
         {
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"Loading {ActiveMap?.GetType().Name}");
+
+            DebugLog.Msg($"Loading {ActiveMap?.GetType().Name}");
         
             PlayerCamera = (Camera)CreateEntity(new Camera());
         }
@@ -20,8 +20,8 @@ namespace HeatBlastEngine
 
         public Entity CreateEntity(Entity ent)
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"created {ent}");
+
+            DebugLog.Msg($"created {ent}");
             EntityList.Add(ent);
         
             return ent;
@@ -32,14 +32,8 @@ namespace HeatBlastEngine
         public void UnloadMap()
         {
             if (ActiveMap == null) return;
-            foreach (IDisposable entity in ActiveMap.EntityList.OfType<IDisposable>())
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                entity.Dispose();
-                Console.WriteLine($"{entity.GetType().Name} disposed");
-            }
 
-            Console.WriteLine($"{ActiveMap.GetType().Name} unloaded");
+            DebugLog.Warning($"{ActiveMap.GetType().Name} unloaded");
             ActiveMap.EntityList.Clear();
             ActiveMap = null;
         }

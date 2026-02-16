@@ -21,7 +21,7 @@ namespace HeatBlastEngine
             _gl = RenderManager.GL;
             LoadModel(filepath);
             stopwatch.Stop();
-            Console.WriteLine($"Model loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
+            DebugLog.Stats($"Model loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
         }
 
         private unsafe void LoadModel(string filepath)

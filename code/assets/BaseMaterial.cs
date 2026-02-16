@@ -35,29 +35,27 @@ namespace HeatBlastEngine
             if (_materialCache.ContainsKey(filepath))
             {
                 Stopwatch cachedwatch = Stopwatch.StartNew();
-                Console.WriteLine($"[BaseMaterial] Returning cached material: {filepath}");
-                Console.ForegroundColor = ConsoleColor.Blue;
+                
+                DebugLog.Stats($"[BaseMaterial] Loading from file: {filepath}");
+
                 cachedwatch.Stop();
-                Console.WriteLine($"texture loaded in: {cachedwatch.ElapsedTicks} ticks ({cachedwatch.ElapsedMilliseconds} ms)");
-                Console.ResetColor();
+                DebugLog.Stats($"texture loaded in: {cachedwatch.ElapsedTicks} ticks ({cachedwatch.ElapsedMilliseconds} ms)");
+
                 return _materialCache[filepath];
             }
             
             Stopwatch stopwatch = Stopwatch.StartNew();
-            string jsonString = File.ReadAllText(filepath);
-            if (jsonString is null)
-            {
-                Console.WriteLine($"faile to load material{filepath}");
-                return null;
-            }
+
+                string jsonString = File.ReadAllText(filepath);
+                
             BaseMaterial baseMaterial = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
 
 
             //TODO: Handle textureless materials
-            Console.ForegroundColor = ConsoleColor.Blue;
+
             stopwatch.Stop();
-            Console.WriteLine($"texture loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
-            Console.ResetColor();
+            DebugLog.Stats($"texture loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
+
 
                 BaseMaterial newMaterial = new BaseMaterial(
                     new BaseShader(baseMaterial.Shader.vertexShaderPath, baseMaterial.Shader.fragmentShaderPath),
@@ -70,6 +68,8 @@ namespace HeatBlastEngine
                 _materialCache[filepath] = newMaterial;
 
                 return newMaterial;
+            
+
 
         }
         

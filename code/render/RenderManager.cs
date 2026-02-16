@@ -13,48 +13,41 @@ namespace HeatBlastEngine
 
 
     
-        public static unsafe void Render(ModelRender rendmdl,Camera camera, IWindow _window, BaseMaterial? material)
+        public static unsafe void Render(ModelRender modelRender,Camera camera, IWindow _window, BaseMaterial? material)
         {
-            if (rendmdl.BaseMaterial is null && rendmdl.Model is not null)
+            if (modelRender.BaseMaterial is null && modelRender.Model is not null)
             {
+                DebugLog.Error($"No Material Set on {modelRender}, using error material");
 
-            
-   
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine($"No Material Set on {rendmdl}, using error material");
-                Console.ResetColor();
-                rendmdl.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/notexture.matfile");
-            
-
+                modelRender.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/notexture.matfile");
 
             }
-            if (rendmdl.Model is null)
+            if (modelRender.Model is null)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Error.WriteLine($"No Model Set on {rendmdl}");
-                Console.ResetColor();
-                rendmdl.Model = new Model("models/editor/error.obj");
-                rendmdl.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/error.matfile");
+                DebugLog.Error($"No Model Set on {modelRender}");
+                modelRender.Model = new Model("models/editor/error.obj");
+                modelRender.BaseMaterial = BaseMaterial.LoadFromFile("textures/dev/error.matfile");
             }
 
             var size = _window.FramebufferSize;
-            var model = Matrix4x4.CreateFromQuaternion(rendmdl.entity.GetComponent<Transform>().Rotation) * Matrix4x4.CreateTranslation(rendmdl.entity.GetComponent<Transform>().Position);
+            var x4 = Matrix4x4.CreateFromQuaternion(modelRender.entity.GetComponent<Transform>().Rotation) * Matrix4x4.CreateTranslation(modelRender.entity.GetComponent<Transform>().Position);
             var view = Matrix4x4.CreateLookAt(camera.GetComponent<Transform>().Position, camera.GetComponent<Transform>().Position + camera.Front, Vector3.UnitY);
             var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
-        
-            rendmdl.BaseMaterial.Shader.Use();
-            rendmdl.BaseMaterial.Shader.SetUniform("uViewPos", camera.GetComponent<Transform>().Position);
-            rendmdl.BaseMaterial.Shader.SetUniform("uView", view);
-            rendmdl.BaseMaterial.Shader.SetUniform("uProjection", projection);
-            rendmdl.BaseMaterial.Shader.SetUniform("uTime", Time.Elapsed);
-            foreach (var mesh in rendmdl.Model.Meshes)
+
+            if (modelRender.BaseMaterial is null) throw new Exception("Failed to load BaseMaterial");
+            modelRender.BaseMaterial.Shader.Use();
+            modelRender.BaseMaterial.Shader.SetUniform("uViewPos", camera.GetComponent<Transform>().Position);
+            modelRender.BaseMaterial.Shader.SetUniform("uView", view);
+            modelRender.BaseMaterial.Shader.SetUniform("uProjection", projection);
+            modelRender.BaseMaterial.Shader.SetUniform("uTime", Time.Elapsed);
+            foreach (var mesh in modelRender.Model.Meshes)
             {
             
                 mesh.Bind();
-                rendmdl.BaseMaterial.Texture.Bind();
+                modelRender.BaseMaterial.Texture.Bind();
                 if (material is null)
                 {
-                    rendmdl.BaseMaterial.Shader.SetUniform("uModel", model);
+                    modelRender.BaseMaterial.Shader.SetUniform("uModel", x4);
                     GL.DrawArrays(PrimitiveType.Triangles, 0, (uint)mesh.Indices.Length);
                     return;
                 }
@@ -67,7 +60,7 @@ namespace HeatBlastEngine
 
                 if (material.flags == RenderFlags.Default)
                 {
-                    rendmdl.BaseMaterial.Shader.SetUniform("uModel", model);
+                    modelRender.BaseMaterial.Shader.SetUniform("uModel", x4);
                     GL.DrawArrays(PrimitiveType.Triangles, 0, (uint)mesh.Indices.Length);
                 }
 

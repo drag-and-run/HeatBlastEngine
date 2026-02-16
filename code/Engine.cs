@@ -3,7 +3,6 @@
 using System.Drawing;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Maths;
@@ -19,7 +18,7 @@ namespace HeatBlastEngine
         private static ImGuiController _controller;
     
 
-        public static Action OnLoadEvent;
+        public static Action LoadEvent;
 
         public static void Init(string[] args)
         {
@@ -40,7 +39,6 @@ namespace HeatBlastEngine
             RenderManager._window.Closing += OnClose;
 
             RenderManager._window.Run();
-
         }
     
         private static void OnFramebufferResize(Vector2D<int> newsize)
@@ -77,23 +75,19 @@ namespace HeatBlastEngine
             RenderManager.GL.Enable(GLEnum.CullFace);
             RenderManager.GL.Enable(EnableCap.Multisample);
             RenderManager.GL.Enable(GLEnum.DepthTest);
-            RenderManager.GL.Enable(GLEnum.DebugOutput);
-            RenderManager.GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
-            {
-                string msg = Marshal.PtrToStringAnsi(message, length);
-            }, IntPtr.Zero);
             #endregion
 
             //Initializes a map and adds all the entities there
             //TODO: parser/editor for that
-            World.ActiveMap = new World();
-            World.ActiveMap.LoadMap();
+            //World.ActiveMap = new World();
+            //World.ActiveMap.LoadMap();
         
 
         
             //Imgui
             _controller = new ImGuiController(RenderManager.GL, RenderManager._window, input);
-            OnLoadEvent?.Invoke();
+            
+            LoadEvent?.Invoke();
         }
     
 
@@ -140,6 +134,7 @@ namespace HeatBlastEngine
         public static int entcount = 0;
         private static unsafe void OnRender(double deltaTime) 
         {
+           
             RenderManager.GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             RenderManager.GL.ClearDepth(1f);
 
@@ -187,8 +182,6 @@ namespace HeatBlastEngine
             {
                 if (ImGui.Button("ADD SKYBOX"))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("PRESSED");
                     var sky = World.ActiveMap.CreateEntity(new Entity());
                     sky.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/skybox.matfile", RenderFlags.Skybox), new Model("models/editor/cube.obj")));
                 }
@@ -226,6 +219,12 @@ namespace HeatBlastEngine
         {
             if (keyarg == Key.Escape) RenderManager._window.Close();
 
+
+            if (keyarg == Key.Tab)
+            {
+
+            }
+            
             if (keyarg == Key.C)
             {
                 if (isCursorVisible)
