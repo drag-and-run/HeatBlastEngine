@@ -1,35 +1,44 @@
 namespace HeatBlastEngine
 {
-    public class World
+    public class World(string name)
     {
+        public string Name { get; set; } = name;
+
         public static World? ActiveMap { get; set; }
 
         public HashSet<Entity> EntityList { get; } = [];
 
-        public Camera? PlayerCamera { get; private set; }
-    
-        public void LoadMap()
-        {
+        public static Camera? PlayerCamera { get; private set; }
 
+        public static void Create(bool autoload = false, string name = "untitled")
+        {
+            if (ActiveMap is not null) return;
+            ActiveMap = new World(name);
+
+            if (!autoload) return;
+            Load();
+        }
+    
+        public static void Load()
+        {
             DebugLog.Msg($"Loading {ActiveMap?.GetType().Name}");
-        
             PlayerCamera = (Camera)CreateEntity(new Camera());
         }
 
 
 
-        public Entity CreateEntity(Entity ent)
+        public static Entity? CreateEntity(Entity ent)
         {
-
+            if (ActiveMap is null) return null;
             DebugLog.Msg($"created {ent}");
-            EntityList.Add(ent);
+            ActiveMap.EntityList.Add(ent);
         
             return ent;
         }
     
 
     
-        public void UnloadMap()
+        public static void Unload()
         {
             if (ActiveMap == null) return;
 

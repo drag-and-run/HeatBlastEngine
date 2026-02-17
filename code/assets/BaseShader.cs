@@ -7,18 +7,18 @@ namespace HeatBlastEngine
 
     public class BaseShader : IDisposable
     {
-        private uint _handle;
-        private GL _gl = null!;
+        private readonly uint _handle;
+        private readonly GL _gl = null!;
 
-        public string vertexShaderPath { get;  set; }
-        public string fragmentShaderPath { get;  set; }
+        public string? VertexShaderPath { get;  set; }
+        public string? FragmentShaderPath { get;  set; }
 
         public BaseShader() { }
 
         public BaseShader(string vertexPath, string fragmentPath)
         {
-            vertexShaderPath = vertexPath;
-            fragmentShaderPath = fragmentPath;
+            VertexShaderPath = vertexPath;
+            FragmentShaderPath = fragmentPath;
             _gl = RenderManager.GL;
             
             uint vertex = LoadShader(ShaderType.VertexShader, vertexPath);

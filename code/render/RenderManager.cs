@@ -30,7 +30,7 @@ namespace HeatBlastEngine
             }
 
             var size = _window.FramebufferSize;
-            var x4 = Matrix4x4.CreateFromQuaternion(modelRender.entity.GetComponent<Transform>().Rotation) * Matrix4x4.CreateTranslation(modelRender.entity.GetComponent<Transform>().Position);
+            var x4 = Matrix4x4.CreateFromQuaternion(modelRender.Entity.GetComponent<Transform>().Rotation) * Matrix4x4.CreateTranslation(modelRender.Entity.GetComponent<Transform>().Position);
             var view = Matrix4x4.CreateLookAt(camera.GetComponent<Transform>().Position, camera.GetComponent<Transform>().Position + camera.Front, Vector3.UnitY);
             var projection = Matrix4X4.CreatePerspectiveFieldOfView(float.DegreesToRadians(camera.Fov), (float)size.X / size.Y, 0.01f, 1000f);
 

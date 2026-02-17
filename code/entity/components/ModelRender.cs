@@ -1,30 +1,18 @@
+using System.Diagnostics;
+
 namespace HeatBlastEngine
 {
 
-    public class ModelRender : Component, IDisposable
+    public class ModelRender(BaseMaterial? baseMaterial, Model model) : Component
     {
-        public BaseMaterial? BaseMaterial;
-        public Model? Model;
-
-        public ModelRender(BaseMaterial baseMaterial, Model _model)
-        {
-            BaseMaterial = baseMaterial;
-            Model = _model;
-        }
+        public BaseMaterial? BaseMaterial = baseMaterial;
+        public Model? Model = model;
 
         public void Render(double deltaTime)
         {
             if (World.ActiveMap is null) return;
-            RenderManager.Render(this, World.ActiveMap.PlayerCamera, RenderManager._window, BaseMaterial);
-        }
-
-
-
-        public virtual void Dispose()
-        {
-            BaseMaterial.Texture.Dispose();
-            BaseMaterial.Shader.Dispose();
-            Model.Dispose();
+            if (World.PlayerCamera is null) return;
+                RenderManager.Render(this, World.PlayerCamera, RenderManager._window, BaseMaterial);
         }
     }
 }

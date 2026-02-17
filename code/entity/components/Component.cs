@@ -2,6 +2,6 @@ namespace HeatBlastEngine
 {
     public class Component
     {
-        public Entity entity;
+        public Entity? Entity;
     }
 }

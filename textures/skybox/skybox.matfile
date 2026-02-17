@@ -1,8 +1,8 @@
 {
   "Name": "sky_material",
   "Shader": {
-    "vertexShaderPath": "shaders/vert_cubemap.glsl",
-    "fragmentShaderPath": "shaders/frag_cubemap.glsl"
+    "VertexShaderPath": "shaders/vert_cubemap.glsl",
+    "FragmentShaderPath": "shaders/frag_cubemap.glsl"
   },
   "Texture": {
     "Type": "Cubemap",

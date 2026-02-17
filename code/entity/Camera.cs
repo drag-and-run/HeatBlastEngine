@@ -5,7 +5,10 @@ namespace HeatBlastEngine
 {
     public class Camera : Entity, IMouseMove
     {
-        public Camera(string name = "Camera") : base(name) {}
+        public Camera(string name = "Camera") : base(name)
+        {
+
+        }
 
         public float Yaw = 270f;
         public float Pitch = 0f;
@@ -18,24 +21,25 @@ namespace HeatBlastEngine
         public Vector3 Front = new Vector3(0, 0, 0);
 
 
+        
 
 
         public override void OnUpdate(double deltaTime)
         {
             var speed = 5f * (float)deltaTime;
-            if (InputManager.primaryKeyboard.IsKeyPressed(Key.W))
+            if (InputManager.PrimaryKeyboard.IsKeyPressed(Key.W))
             {
                 GetComponent<Transform>().Position += speed * Front;
             }
-            if (InputManager.primaryKeyboard.IsKeyPressed(Key.S))
+            if (InputManager.PrimaryKeyboard.IsKeyPressed(Key.S))
             {
                 GetComponent<Transform>().Position -= speed * Front;
             }
-            if (InputManager.primaryKeyboard.IsKeyPressed(Key.D))
+            if (InputManager.PrimaryKeyboard.IsKeyPressed(Key.D))
             {
                 GetComponent<Transform>().Position += Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }
-            if (InputManager.primaryKeyboard.IsKeyPressed(Key.A))
+            if (InputManager.PrimaryKeyboard.IsKeyPressed(Key.A))
             {
                 GetComponent<Transform>().Position -= Vector3.Normalize(Vector3.Cross(Front, Vector3.UnitY)) * speed;
             }

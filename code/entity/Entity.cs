@@ -13,17 +13,18 @@ namespace HeatBlastEngine
 
             DebugLog.Msg($"Entity created: {GetType()}");
 
-            AddComponent(new Transform());
+           AddComponent(new Transform());
         }
 
         public void AddComponent(Component component)
         {
             _components.Add(component);
-            component.entity = this;
+            component.Entity = this;
         }
 
-        public T GetComponent<T>() where T : Component
+        public T? GetComponent<T>() where T : Component
         {
+
             foreach (var component in _components)
                 if (component.GetType().Equals(typeof(T)))
                     return (T)component;

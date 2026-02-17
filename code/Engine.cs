@@ -1,5 +1,6 @@
 #define IMGUI
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
 using System.Reflection;
@@ -13,20 +14,20 @@ namespace HeatBlastEngine
 {
     public static class Engine
     {
-        public static string MAIN_TITLE = "HeastBlastEngine";
-        public static int ENGINE_FPS = 140;
-        private static ImGuiController _controller;
-    
+        public static string Title = "HeastBlastEngine";
+        public static int Fps = 140;
+        private static ImGuiController? _controller;
 
-        public static Action LoadEvent;
+
+        public static Action? LoadEvent { get;  set; }
 
         public static void Init(string[] args)
         {
             WindowOptions options = WindowOptions.Default with
             {
                 Size = new Vector2D<int>(1920, 1080),
-                Title = MAIN_TITLE,
-                FramesPerSecond = ENGINE_FPS,
+                Title = Title,
+                FramesPerSecond = Fps,
                 VSync = false,
                 Samples = 8
             };
@@ -47,23 +48,22 @@ namespace HeatBlastEngine
         }
 
     
-        private static unsafe void OnLoad() 
+        private static void OnLoad() 
         {
             #region input 
             IInputContext input = RenderManager._window.CreateInput();
-            for (int i = 0; i < input.Keyboards.Count; i++)
+            foreach (var keyboard in input.Keyboards)
             {
-                input.Keyboards[i].KeyDown += KeyDown;
-           
+                keyboard.KeyDown += KeyDown;
             }
-            InputManager.primaryKeyboard = input.Keyboards.FirstOrDefault();
+            InputManager.PrimaryKeyboard = input.Keyboards.FirstOrDefault();
 
-            for (int i = 0; i < input.Mice.Count; i++)
+            foreach (var mouse in input.Mice)
             {
-                input.Mice[i].Cursor.CursorMode = CursorMode.Raw;
-                input.Mice[i].MouseMove += OnMouseMove;
+                mouse.Cursor.CursorMode = CursorMode.Raw;
+                mouse.MouseMove += OnMouseMove;
             }
-            InputManager.primaryMouse = input.Mice.FirstOrDefault();
+            InputManager.PrimaryMouse = input.Mice.FirstOrDefault();
             #endregion
 
             #region opengl init flags
@@ -76,14 +76,7 @@ namespace HeatBlastEngine
             RenderManager.GL.Enable(EnableCap.Multisample);
             RenderManager.GL.Enable(GLEnum.DepthTest);
             #endregion
-
-            //Initializes a map and adds all the entities there
-            //TODO: parser/editor for that
-            //World.ActiveMap = new World();
-            //World.ActiveMap.LoadMap();
-        
-
-        
+            
             //Imgui
             _controller = new ImGuiController(RenderManager.GL, RenderManager._window, input);
             
@@ -96,10 +89,10 @@ namespace HeatBlastEngine
         {
             if (World.ActiveMap is not null)
             {
-                World.ActiveMap.PlayerCamera.OnMouseMove(mouse, position);
+                World.PlayerCamera?.OnMouseMove(mouse, position);
             }
         }
-        static TimeSince sinceAdded = 0;
+
         private static void OnUpdate(double deltaTime)
         {
             Time.Elapsed = (float)RenderManager._window.Time;
@@ -114,24 +107,24 @@ namespace HeatBlastEngine
             if (World.ActiveMap is null) return;
 
 
-        
-            if (InputManager.primaryKeyboard.IsKeyPressed(Key.G) && sinceAdded > 0.1f)
+
+            if (InputManager.PrimaryKeyboard != null && InputManager.PrimaryKeyboard.IsKeyPressed(Key.G))
             {
-                var ent = World.ActiveMap.CreateEntity(new Entity());
+                var ent = World.CreateEntity(new Entity());
 
 
             
-                ent.AddComponent(new ModelRender(null, new Model("models/box.obj")));
-                ent.GetComponent<Transform>().Position = World.ActiveMap.PlayerCamera.GetComponent<Transform>().Position +
-                                                         World.ActiveMap.PlayerCamera.Front * 5f;
+                ent.AddComponent(new ModelRender(null!, new Model("models/box.obj")));
 
-                sinceAdded = 0;
 
+                Debug.Assert(World.PlayerCamera != null, "World.PlayerCamera is null");
+                ent.GetComponent<Transform>().Position = World.PlayerCamera.GetComponent<Transform>().Position +
+                                                         World.PlayerCamera.Front * 5f;
             }
 
         }
 
-        public static int entcount = 0;
+        private static readonly int Entcount = 0;
         private static unsafe void OnRender(double deltaTime) 
         {
            
@@ -141,11 +134,11 @@ namespace HeatBlastEngine
 
         
 #if IMGUI
-            _controller.Update((float)deltaTime);
+            _controller?.Update((float)deltaTime);
             ImGui.Begin("DEBUG");
-            ImGui.SliderInt("FPS", ref ENGINE_FPS, 5, 1000);
+            ImGui.SliderInt("FPS", ref Fps, 5, 1000);
             ImGui.Text(Time.Elapsed.ToString());
-            ImGui.Text(entcount.ToString());
+            ImGui.Text(Entcount.ToString());
 
 
         
@@ -168,7 +161,9 @@ namespace HeatBlastEngine
                         var feature = property.GetCustomAttribute<ShowInEditorAttribute>();
                         if (feature != null)
                         {
-                            var transformPosition = entity.GetComponent<Transform>().Position;
+                            var comp = entity.GetComponent<Transform>();
+                            if (comp is null) return;
+                            var transformPosition = comp.Position;
                             ImGui.SliderFloat3(entity.Id.ToString(),ref transformPosition, 0,5f);
                             entity.GetComponent<Transform>().Position = transformPosition;
                         }
@@ -182,8 +177,8 @@ namespace HeatBlastEngine
             {
                 if (ImGui.Button("ADD SKYBOX"))
                 {
-                    var sky = World.ActiveMap.CreateEntity(new Entity());
-                    sky.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/skybox.matfile", RenderFlags.Skybox), new Model("models/editor/cube.obj")));
+                    var sky = World.CreateEntity(new Entity());
+                    sky?.AddComponent(new ModelRender(BaseMaterial.LoadFromFile("textures/skybox/skybox.matfile", RenderFlags.Skybox), new Model("models/editor/cube.obj")));
                 }
             }
 
@@ -192,27 +187,28 @@ namespace HeatBlastEngine
 
             if (World.ActiveMap is not null)
             {
-                ImGui.Text("CURRENT MAP: " + World.ActiveMap.ToString());
+                ImGui.Text("CURRENT MAP: " + World.ActiveMap.Name);
             }
             else
             {
                 ImGui.Text("NO MAP LOADED");
             }
         
-            RenderManager._window.FramesPerSecond = ENGINE_FPS;
+            RenderManager._window.FramesPerSecond = Fps;
         
 #if IMGUI
             ImGui.StyleColorsLight();
             ImGui.End();
-            _controller.Render();
+            _controller?.Render();
 #endif
 
 
 
         }
-        static bool isCursorVisible = false;
-        static bool isFullscreen = false;
-        static bool drawWireframe = false;
+
+        private static bool _isCursorVisible = false;
+        private static bool _isFullscreen = false;
+        private static bool _drawWireframe = false;
 
 
         private static void KeyDown(IKeyboard keyboard, Key keyarg, int keyCode) 
@@ -227,16 +223,16 @@ namespace HeatBlastEngine
             
             if (keyarg == Key.C)
             {
-                if (isCursorVisible)
+                if (_isCursorVisible)
                 {
-                    InputManager.primaryMouse.Cursor.CursorMode = CursorMode.Raw;
-                    isCursorVisible = false;
+                    InputManager.PrimaryMouse?.Cursor.CursorMode = CursorMode.Raw;
+                    _isCursorVisible = false;
                     Camera.lookSensitivity = 0.1f;
                 }
                 else
                 {
-                    InputManager.primaryMouse.Cursor.CursorMode = CursorMode.Normal;
-                    isCursorVisible = true;
+                    InputManager.PrimaryMouse?.Cursor.CursorMode = CursorMode.Normal;
+                    _isCursorVisible = true;
                     Camera.lookSensitivity = 0;
                 }
             }
@@ -244,30 +240,23 @@ namespace HeatBlastEngine
             if (keyarg == Key.V)
             {
             
-                drawWireframe = !drawWireframe;
-                RenderManager.GL.PolygonMode(GLEnum.FrontAndBack, drawWireframe? GLEnum.Line : GLEnum.Fill);
+                _drawWireframe = !_drawWireframe;
+                RenderManager.GL.PolygonMode(GLEnum.FrontAndBack, _drawWireframe? GLEnum.Line : GLEnum.Fill);
             }
 
             if (keyarg == Key.F)
             {
-                isFullscreen = !isFullscreen;
-                RenderManager._window.WindowState = isFullscreen? WindowState.Fullscreen: WindowState.Normal;
+                _isFullscreen = !_isFullscreen;
+                RenderManager._window.WindowState = _isFullscreen? WindowState.Fullscreen: WindowState.Normal;
             }
 
             switch (keyarg)
             {
                 case Key.X:
-                    if (World.ActiveMap is null) return;
-                    World.ActiveMap.UnloadMap();
+                    World.Unload();
                     break;
                 case Key.R:
-                    if (World.ActiveMap is not null)
-                    {
-                        World.ActiveMap.UnloadMap();
-                    }
-                
-                    World.ActiveMap = new World();
-                    World.ActiveMap.LoadMap();
+                    World.Create(true);
                     break;
 
             }

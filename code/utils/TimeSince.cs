@@ -43,7 +43,7 @@ public struct TimeSince : IEquatable<TimeSince>
 	#region equality
 	public static bool operator ==( TimeSince left, TimeSince right ) => left.Equals( right );
 	public static bool operator !=( TimeSince left, TimeSince right ) => !(left == right);
-	public override bool Equals( object obj ) => obj is TimeSince o && Equals( o );
+	public override bool Equals( object? obj ) => obj is TimeSince o && Equals( o );
 	public readonly bool Equals( TimeSince o ) => this.time == o.time;
 	public readonly override int GetHashCode() => time.GetHashCode();
 	#endregion
@@ -102,7 +102,7 @@ public struct TimeUntil : IEquatable<TimeUntil>
 	#region equality
 	public static bool operator ==( TimeUntil left, TimeUntil right ) => left.Equals( right );
 	public static bool operator !=( TimeUntil left, TimeUntil right ) => !(left == right);
-	public readonly override bool Equals( object obj ) => obj is TimeUntil o && Equals( o );
+	public readonly override bool Equals( object? obj ) => obj is TimeUntil o && Equals( o );
 	public readonly bool Equals( TimeUntil o ) => time == o.time;
 	public readonly override int GetHashCode() => HashCode.Combine( time );
 	#endregion

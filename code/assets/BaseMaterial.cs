@@ -29,7 +29,7 @@ namespace HeatBlastEngine
 
         }
 
-        public static BaseMaterial LoadFromFile(string filepath, RenderFlags flags = RenderFlags.Default)
+        public static BaseMaterial? LoadFromFile(string filepath, RenderFlags flags = RenderFlags.Default)
         {
             // First, check if the material is already in the cache
             if (_materialCache.ContainsKey(filepath))
@@ -48,7 +48,7 @@ namespace HeatBlastEngine
 
                 string jsonString = File.ReadAllText(filepath);
                 
-            BaseMaterial baseMaterial = JsonSerializer.Deserialize<BaseMaterial>(jsonString);
+            BaseMaterial baseMaterial = JsonSerializer.Deserialize<BaseMaterial>(jsonString) ?? throw new InvalidOperationException();
 
 
             //TODO: Handle textureless materials
@@ -57,8 +57,10 @@ namespace HeatBlastEngine
             DebugLog.Stats($"texture loaded in: {stopwatch.ElapsedTicks} ticks ({stopwatch.ElapsedMilliseconds} ms)");
 
 
+            if (baseMaterial.Shader is { VertexShaderPath: not null, FragmentShaderPath: not null })
+            {
                 BaseMaterial newMaterial = new BaseMaterial(
-                    new BaseShader(baseMaterial.Shader.vertexShaderPath, baseMaterial.Shader.fragmentShaderPath),
+                    new BaseShader(baseMaterial.Shader.VertexShaderPath, baseMaterial.Shader.FragmentShaderPath),
                     new BaseTexture(RenderManager.GL, baseMaterial.Texture.Path, baseMaterial.Texture.Type),
                     baseMaterial.Name,
                     flags
@@ -68,9 +70,9 @@ namespace HeatBlastEngine
                 _materialCache[filepath] = newMaterial;
 
                 return newMaterial;
-            
+            }
 
-
+            return null;
         }
         
 

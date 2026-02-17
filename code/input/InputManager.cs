@@ -4,8 +4,8 @@ namespace HeatBlastEngine
 {
     public class InputManager
     {
-        public static IKeyboard primaryKeyboard { get;  set; }
-        public static IMouse primaryMouse { get; set; }
+        public static IKeyboard? PrimaryKeyboard { get; set; }
+        public static IMouse? PrimaryMouse { get; set; }
     }
 }
 

@@ -89,7 +89,7 @@ namespace HeatBlastEngine
                     // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't 
                     // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
                     Vector3 texcoord3 = mesh->MTextureCoords[0][i];
-                    vertex.uvCoords = new Vector2(texcoord3.X, texcoord3.Y);
+                    vertex.UvCoords = new Vector2(texcoord3.X, texcoord3.Y);
                 }
 
                 if (mesh->MColors[0] != null)
@@ -144,8 +144,8 @@ namespace HeatBlastEngine
                 vertices.Add(vertex.Color.Y);
                 vertices.Add(vertex.Color.Z);
 
-                vertices.Add(vertex.uvCoords.X);
-                vertices.Add(vertex.uvCoords.Y);
+                vertices.Add(vertex.UvCoords.X);
+                vertices.Add(vertex.UvCoords.Y);
             }
 
             return vertices.ToArray();

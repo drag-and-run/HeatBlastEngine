@@ -1,8 +1,8 @@
 {
   "Name": "test_material",
   "Shader": {
-    "vertexShaderPath": "shaders/vertshader.glsl",
-    "fragmentShaderPath": "shaders/frag_light_basic.glsl"
+    "VertexShaderPath": "shaders/vertshader.glsl",
+    "FragmentShaderPath": "shaders/frag_light_basic.glsl"
   },
   "Texture": {
     "Type": "Color",
